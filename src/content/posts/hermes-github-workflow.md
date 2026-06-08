@@ -83,25 +83,33 @@ Insensibles à la casse, reconnaissables en commentaire GitHub :
 
 ---
 
-## L'anti-loop — le détail qui tue
+## L'anti-loop et la sécurité — les détails qui tuent
 
-Quand Hermes Agent commente sur une issue ou PR, ce commentaire déclenche à son tour un webhook. Sans protection, on entre dans une boucle infinie : Hermes poste → webhook se déclenche → Hermes traite → Hermes reposte → …
+Deux protections sont en place pour éviter les abus :
 
-La solution est simple et élégante : **un tag invisible dans les commentaires**.
+### 1. Filtre par auteur (sécurité)
+
+Avant toute chose, le worker webhook vérifie **qui** a envoyé l'événement. Si l'auteur (`sender.login`) n'est pas le propriétaire du repo, le message est ignoré silencieusement. Personne d'autre ne peut envoyer de commande à Hermes.
+
+```python
+if sender.login != "alshyra":
+    return  # Ignorer, utilisateur non autorisé
+```
+
+### 2. Le tag anti-boucle
+
+Quand Hermes Agent poste un commentaire, il ajoute ce tag en commentaire HTML :
 
 ```html
 <!-- hermes -->
 ```
 
-À chaque fois qu'Hermes Agent poste un commentaire, il ajoute ce tag en commentaire HTML. Le webhook gateway vérifie sa présence : si le commentaire entrant contient `<!-- hermes -->`, il est ignoré.
+Le webhook gateway vérifie sa présence : si le commentaire entrant contient `<!-- hermes -->`, il est ignoré.
 
 ```python
-# Dans le worker webhook — pseudo-code
 if "<!-- hermes -->" in comment_body:
     return  # Ignorer, c'est notre propre commentaire
 ```
-
-Pas de boucle, pas de gaspillage de tokens, pas de spam sur l'issue.
 
 ---
 
@@ -156,7 +164,7 @@ Ce workflow est encore jeune. Les prochaines améliorations que je veux explorer
 - **Dépendances entre tâches** — merges conditionnels, approbations en séquence
 - **Intégration WhatsApp** — approuver un plan depuis son téléphone
 
-Le code source d'Hermes Agent est ouvert : [github.com/nousresearch/hermes](https://github.com/nousresearch/hermes). La doc du workflow GitHub est dans le skill `github-issue-pr-agent` si vous voulez reproduire le setup.
+Le code source d'Hermes Agent est ouvert : [github.com/nousresearch/hermes](https://github.com/nousresearch/hermes). Le workflow complet avec le prompt, la configuration webhook et le système de second brain est disponible dans le dépôt [github.com/alshyra/hermes-github-agent](https://github.com/alshyra/hermes-github-agent) — prêt à l'emploi.
 
 ---
 
