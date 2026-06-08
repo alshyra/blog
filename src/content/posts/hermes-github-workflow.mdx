@@ -59,15 +59,18 @@ Cette ligne suffit à connecter un repo entier. Le prompt `gh-plan-approve.txt` 
 
 Insensibles à la casse, reconnaissables en commentaire GitHub :
 
-| Commande | Action |
-|----------|--------|
-| **Hermes plan** | Analyser et proposer un plan |
-| **Hermes approve** | Valider et exécuter le plan |
-| **Hermes abort** | Annuler l'exécution en cours |
-| **Hermes retry** | Réessayer après un échec |
-| **Hermes review** | Review de code |
-| **Hermes fix all** | Corriger tous les problèmes |
-| **Hermes fix it** | Corriger un problème spécifique |
+<table>
+  <thead><tr><th>Commande</th><th>Action</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Hermes plan</strong></td><td>Analyser et proposer un plan</td></tr>
+    <tr><td><strong>Hermes approve</strong></td><td>Valider et exécuter le plan</td></tr>
+    <tr><td><strong>Hermes abort</strong></td><td>Annuler l'exécution en cours</td></tr>
+    <tr><td><strong>Hermes retry</strong></td><td>Réessayer après un échec</td></tr>
+    <tr><td><strong>Hermes review</strong></td><td>Review de code</td></tr>
+    <tr><td><strong>Hermes fix all</strong></td><td>Corriger tous les problèmes</td></tr>
+    <tr><td><strong>Hermes fix it</strong></td><td>Corriger un problème spécifique</td></tr>
+  </tbody>
+</table>
 
 ---
 
@@ -123,13 +126,16 @@ Tout ça sans que j'aie à ouvrir un terminal.
 
 Tout tourne sur un petit VPS OVH :
 
-| Service | Rôle |
-|---------|------|
-| **Hermes Agent** | Agent IA principal (systemd, standalone) |
-| **Hermes WebUI** | Interface web (Docker, in-process) |
-| **Traefik** | Reverse proxy, SSL Let's Encrypt |
-| **OpenCode** | Webhook gateway secondaire (port 4097) |
-| **Docker Compose** | Conteneurisation des services |
+<table>
+  <thead><tr><th>Service</th><th>Rôle</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Hermes Agent</strong></td><td>Agent IA principal (systemd, standalone)</td></tr>
+    <tr><td><strong>Hermes WebUI</strong></td><td>Interface web (Docker, in-process)</td></tr>
+    <tr><td><strong>Traefik</strong></td><td>Reverse proxy, SSL Let's Encrypt</td></tr>
+    <tr><td><strong>OpenCode</strong></td><td>Webhook gateway secondaire (port 4097)</td></tr>
+    <tr><td><strong>Docker Compose</strong></td><td>Conteneurisation des services</td></tr>
+  </tbody>
+</table>
 
 Les webhooks arrivent directement sur le VPS — pas de tunnel, pas de service externe. Le VPS expose les ports 80/443, Traefik fait le routage.
 

@@ -388,74 +388,53 @@
 </style>
 
 <script>
-  // Intersection Observer pour activer chaque étape au scroll
-  const steps = document.querySelectorAll('.step');
-  const allNodes = document.querySelectorAll('.node');
-  const allArrows = document.querySelectorAll('.arrow');
+  (function() {
+    const steps = document.querySelectorAll('.step');
+    const allNodes = document.querySelectorAll('.node');
+    const allArrows = document.querySelectorAll('.arrow');
 
-  // Map step → éléments à activer
-  const nodeMap = {};
-  allNodes.forEach(node => {
-    const step = node.dataset.step;
-    if (!nodeMap[step]) nodeMap[step] = [];
-    nodeMap[step].push(node);
-  });
-  const arrowMap = {};
-  allArrows.forEach(arrow => {
-    const step = arrow.dataset.step;
-    if (!arrowMap[step]) arrowMap[step] = [];
-    arrowMap[step].push(arrow);
-  });
+    // Map step → éléments SVG à activer
+    const nodeMap = {}, arrowMap = {};
+    allNodes.forEach(n => { const s = n.dataset.step; (nodeMap[s] = nodeMap[s]||[]).push(n); });
+    allArrows.forEach(a => { const s = a.dataset.step; (arrowMap[s] = arrowMap[s]||[]).push(a); });
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const step = entry.target;
-      const stepNum = step.dataset.step;
-
-      if (entry.isIntersecting) {
-        step.classList.add('active');
-
-        // Activer les nœuds correspondant
-        (nodeMap[stepNum] || []).forEach(node => node.classList.add('visible'));
-        (arrowMap[stepNum] || []).forEach(arrow => arrow.classList.add('visible'));
-
-        // Activer aussi les étapes précédentes (cumulatif)
-        for (let i = 1; i < parseInt(stepNum); i++) {
-          (nodeMap[String(i)] || []).forEach(node => node.classList.add('visible'));
-          (arrowMap[String(i)] || []).forEach(arrow => arrow.classList.add('visible'));
-        }
-      } else {
-        step.classList.remove('active');
-      }
-    });
-  }, { threshold: 0.3 });
-
-  steps.forEach(step => observer.observe(step));
-
-  // Activer la première étape au chargement si visible
-  setTimeout(() => {
-    const firstStep = document.querySelector('.step[data-step="1"]');
-    if (firstStep) {
-      const rect = firstStep.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        firstStep.classList.add('active');
-        (nodeMap['1'] || []).forEach(node => node.classList.add('visible'));
-        (arrowMap['1'] || []).forEach(arrow => arrow.classList.add('visible'));
+    function activateUpTo(stepNum) {
+      for (let i = 1; i <= stepNum; i++) {
+        const s = String(i);
+        (nodeMap[s]||[]).forEach(n => n.classList.add('visible'));
+        (arrowMap[s]||[]).forEach(a => a.classList.add('visible'));
       }
     }
-  }, 100);
 
-  // Mise à jour de la barre de progression mobile
-  const updateProgress = () => {
-    const container = document.querySelector('.scrolly-container');
-    const bar = document.querySelector('.mobile-progress');
-    if (!container || !bar || window.innerWidth > 768) return;
-    const rect = container.getBoundingClientRect();
-    const total = rect.height - window.innerHeight;
-    if (total <= 0) return;
-    const progress = Math.min(1, Math.max(0, -rect.top / total));
-    container.style.setProperty('--scroll-progress', progress);
-  };
-  window.addEventListener('scroll', updateProgress, { passive: true });
-  updateProgress();
+    // Sur desktop : Intersection Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const stepNum = parseInt(entry.target.dataset.step);
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          activateUpTo(stepNum);
+        } else {
+          entry.target.classList.remove('active');
+        }
+      });
+    }, { threshold: 0.2, rootMargin: '-10% 0px -10% 0px' });
+
+    steps.forEach(s => observer.observe(s));
+
+    // Activer le step 1 immédiatement (visible ou pas)
+    activateUpTo(1);
+
+    // Barre de progression mobile
+    const updateProgress = () => {
+      const container = document.querySelector('.scrolly-container');
+      const bar = document.querySelector('.mobile-progress');
+      if (!container || !bar || window.innerWidth > 768) return;
+      const rect = container.getBoundingClientRect();
+      const total = Math.max(1, rect.height - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, -rect.top / total));
+      container.style.setProperty('--scroll-progress', progress);
+    };
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  })();
 </script>
