@@ -7,6 +7,7 @@ homeFeatured: true
 homeHeroOrder: 1
 homeOrder: 1
 ---
+import WorkflowDiagram from '../../components/WorkflowDiagram.astro';
 
 **TL;DR** — Hermes Agent peut écouter les webhooks GitHub, analyser les issues et PR, proposer un plan, l'exécuter sur validation, et merge automatiquement. Le tout sur sa propre infra, sans dépendre d'un SaaS.
 
@@ -28,9 +29,9 @@ C'est beaucoup d'étapes manuelles pour des actions répétitives. Le workflow G
 
 ## L'architecture du workflow
 
-![Workflow GitHub → Hermes Agent](/diagrams/workflow-architecture.excalidraw.png)
+<WorkflowDiagram />
 
-*Le diagramme est éditable — glisse-le sur [excalidraw.com](https://excalidraw.com) pour le modifier.*
+*Le diagramme révèle chaque étape au scroll — les éléments apparaissent un par un.*
 
 ### Le webhook gateway
 

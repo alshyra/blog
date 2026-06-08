@@ -1,0 +1,337 @@
+---
+// WorkflowDiagram.astro — Diagramme interactif avec scrollytelling
+// Chaque étape du workflow apparaît au scroll
+---
+
+<div class="scrolly-container">
+  <!-- Zone diagramme sticky -->
+  <div class="diagram-zone" aria-label="Diagramme du workflow GitHub → Hermes Agent">
+    <svg class="diagram-svg" viewBox="0 0 800 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Définitions : dégradés, marqueurs de flèches -->
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,2 L9,5 L0,8" fill="var(--arrow-color, #666)"/>
+        </marker>
+        <linearGradient id="grad-github" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#a5d8ff"/>
+          <stop offset="100%" stop-color="#74c0fc"/>
+        </linearGradient>
+        <linearGradient id="grad-hermes" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d0bfff"/>
+          <stop offset="100%" stop-color="#b197fc"/>
+        </linearGradient>
+        <linearGradient id="grad-user" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#b2f2bb"/>
+          <stop offset="100%" stop-color="#8ce99a"/>
+        </linearGradient>
+        <linearGradient id="grad-impl" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fff3bf"/>
+          <stop offset="100%" stop-color="#ffec99"/>
+        </linearGradient>
+        <linearGradient id="grad-pr" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#c3fae8"/>
+          <stop offset="100%" stop-color="#96f2d7"/>
+        </linearGradient>
+        <linearGradient id="grad-deploy" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffd8a8"/>
+          <stop offset="100%" stop-color="#ffc078"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- GitHub -->
+      <g class="node node-github" data-step="1">
+        <rect x="40" y="20" width="200" height="80" rx="8" fill="url(#grad-github)" stroke="#1971c2" stroke-width="1.5" class="node-bg"/>
+        <text x="140" y="52" text-anchor="middle" fill="#1971c2" font-size="14" font-weight="600">GitHub</text>
+        <text x="140" y="74" text-anchor="middle" fill="#1971c2" font-size="13">Issue / PR</text>
+      </g>
+
+      <!-- Hermes -->
+      <g class="node node-hermes" data-step="2">
+        <rect x="300" y="20" width="200" height="80" rx="8" fill="url(#grad-hermes)" stroke="#6741d9" stroke-width="1.5" class="node-bg"/>
+        <text x="400" y="52" text-anchor="middle" fill="#6741d9" font-size="14" font-weight="600">Hermes Agent</text>
+        <text x="400" y="74" text-anchor="middle" fill="#6741d9" font-size="13">Webhook Gateway</text>
+      </g>
+
+      <!-- Utilisateur -->
+      <g class="node node-user" data-step="3">
+        <rect x="560" y="20" width="200" height="80" rx="8" fill="url(#grad-user)" stroke="#2f9e44" stroke-width="1.5" class="node-bg"/>
+        <text x="660" y="52" text-anchor="middle" fill="#2f9e44" font-size="14" font-weight="600">Utilisateur</text>
+        <text x="660" y="74" text-anchor="middle" fill="#2f9e44" font-size="13">lit le plan</text>
+      </g>
+
+      <!-- Arrow GitHub → Hermes -->
+      <g class="arrow arrow-gh-hermes" data-step="2">
+        <line x1="240" y1="45" x2="295" y2="45" stroke="var(--arrow-color)" stroke-width="1.5" marker-end="url(#arrow)" class="arrow-line"/>
+        <text x="268" y="36" text-anchor="middle" fill="#666" font-size="11">webhook</text>
+      </g>
+
+      <!-- Arrow Hermes → User -->
+      <g class="arrow arrow-hermes-user" data-step="3">
+        <line x1="500" y1="38" x2="555" y2="38" stroke="var(--arrow-color)" stroke-width="1.5" marker-end="url(#arrow)" class="arrow-line"/>
+        <text x="528" y="30" text-anchor="middle" fill="#666" font-size="11">plan</text>
+      </g>
+
+      <!-- Arrow User → Hermes (retour) -->
+      <g class="arrow arrow-user-hermes" data-step="3">
+        <line x1="555" y1="65" x2="500" y2="65" stroke="#e8590c" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4 3" class="arrow-line"/>
+        <text x="528" y="80" text-anchor="middle" fill="#e8590c" font-size="11">"Hermes approve"</text>
+      </g>
+
+      <!-- Arrow Hermes → Implémentation -->
+      <g class="arrow arrow-hermes-impl" data-step="4">
+        <line x1="400" y1="100" x2="400" y2="155" stroke="var(--arrow-color)" stroke-width="1.5" marker-end="url(#arrow)" class="arrow-line"/>
+      </g>
+
+      <!-- Implémentation -->
+      <g class="node node-impl" data-step="4">
+        <rect x="300" y="160" width="200" height="80" rx="8" fill="url(#grad-impl)" stroke="#e67700" stroke-width="1.5" class="node-bg"/>
+        <text x="400" y="192" text-anchor="middle" fill="#e67700" font-size="13" font-weight="600">Implémentation</text>
+        <text x="400" y="212" text-anchor="middle" fill="#e67700" font-size="12">branch → commit → push</text>
+      </g>
+
+      <!-- Arrow Implémentation → PR -->
+      <g class="arrow arrow-impl-pr" data-step="5">
+        <line x1="400" y1="240" x2="400" y2="295" stroke="var(--arrow-color)" stroke-width="1.5" marker-end="url(#arrow)" class="arrow-line"/>
+      </g>
+
+      <!-- Pull Request -->
+      <g class="node node-pr" data-step="5">
+        <rect x="300" y="300" width="200" height="80" rx="8" fill="url(#grad-pr)" stroke="#0c8599" stroke-width="1.5" class="node-bg"/>
+        <text x="400" y="332" text-anchor="middle" fill="#0c8599" font-size="13" font-weight="600">Pull Request</text>
+        <text x="400" y="352" text-anchor="middle" fill="#0c8599" font-size="12">ouverte → merge</text>
+      </g>
+
+      <!-- Arrow PR → Déploiement -->
+      <g class="arrow arrow-pr-deploy" data-step="6">
+        <line x1="400" y1="380" x2="400" y2="435" stroke="var(--arrow-color)" stroke-width="1.5" marker-end="url(#arrow)" class="arrow-line"/>
+      </g>
+
+      <!-- Déploiement -->
+      <g class="node node-deploy" data-step="6">
+        <rect x="300" y="440" width="200" height="80" rx="8" fill="url(#grad-deploy)" stroke="#d9480f" stroke-width="1.5" class="node-bg"/>
+        <text x="400" y="472" text-anchor="middle" fill="#d9480f" font-size="13" font-weight="600">Déploiement</text>
+        <text x="400" y="492" text-anchor="middle" fill="#d9480f" font-size="12">CI/CD → docker compose</text>
+      </g>
+
+      <!-- Légendes (toujours visibles) -->
+      <g class="legend" opacity="0.6">
+        <text x="40" y="560" fill="#999" font-size="11">Carré <!-- hermes --> anti-boucle</text>
+        <text x="460" y="560" fill="#999" font-size="11">Vérification sender.login</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Zone steps scrollytelling -->
+  <div class="steps-zone">
+    <div class="step" data-step="1">
+      <span class="step-number">01</span>
+      <h3>Une issue GitHub est ouverte</h3>
+      <p>Un bug est signalé, une feature est demandée — le déclencheur classique. Le webhook POST vers Hermes Agent est automatique.</p>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="step-number">02</span>
+      <h3>Hermes analyse et poste un plan</h3>
+      <p>Le webhook gateway reçoit l'événement, lit l'issue via <code>gh issue view</code>, comprend le contexte, et poste un plan d'implémentation détaillé en commentaire.</p>
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="step-number">03</span>
+      <h3>Tu valides (ou pas)</h3>
+      <p>Tu lis le plan. Si ça te convient, tu commentes <strong>"Hermes approve"</strong>. Sinon, <strong>"Hermes abort"</strong> annule tout, <strong>"Hermes plan"</strong> regénère.</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="step-number">04</span>
+      <h3>Implémentation automatique</h3>
+      <p>Hermes bascule sur une branche <code>feat/issue-N</code>, implémente la solution selon le plan, commit et push. Les tests passent ? On continue.</p>
+    </div>
+
+    <div class="step" data-step="5">
+      <span class="step-number">05</span>
+      <h3>Pull Request créée</h3>
+      <p>Une PR est ouverte avec "Closes #N" dans la description. Le CI se déclenche, la review peut commencer.</p>
+    </div>
+
+    <div class="step" data-step="6">
+      <span class="step-number">06</span>
+      <h3>Déploiement en production</h3>
+      <p>Le merge sur <code>main</code> déclenche GitHub Actions → rsync → docker compose up -d. Le correctif est en ligne, tu n'as pas touché un terminal.</p>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  /* Conteneur principal */
+  .scrolly-container {
+    display: flex;
+    gap: 2rem;
+    margin: 3rem 0;
+    position: relative;
+  }
+
+  /* Zone diagramme — sticky sur desktop */
+  .diagram-zone {
+    flex: 0 0 55%;
+    position: sticky;
+    top: 80px;
+    align-self: flex-start;
+    height: fit-content;
+  }
+
+  .diagram-svg {
+    width: 100%;
+    height: auto;
+    --arrow-color: #868e96;
+  }
+
+  /* Styles des nœuds */
+  .node { opacity: 0; transition: opacity 0.4s ease, filter 0.4s ease; }
+  .node.visible { opacity: 1; }
+  .node.active .node-bg { filter: url(#glow); }
+
+  /* Styles des flèches */
+  .arrow { opacity: 0; transition: opacity 0.4s ease; }
+  .arrow.visible { opacity: 1; }
+  .arrow-line { stroke-dasharray: 200; stroke-dashoffset: 200; transition: stroke-dashoffset 0.6s ease; }
+  .arrow.visible .arrow-line { stroke-dashoffset: 0; }
+
+  /* Zone steps */
+  .steps-zone {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .step {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
+  }
+
+  .step.active {
+    background: linear-gradient(135deg, var(--fill-primary, rgba(25,124,168,0.05)), transparent);
+  }
+
+  .step-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-blue, #197ca8);
+    margin-bottom: 0.5rem;
+  }
+
+  .step h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: var(--label-primary, #000);
+  }
+
+  .step p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--label-secondary, #444);
+    margin: 0;
+  }
+
+  .step code {
+    font-size: 0.9em;
+    background: var(--inline-code-bg, rgba(25,124,168,0.08));
+    padding: 0.1em 0.3em;
+    border-radius: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .scrolly-container {
+      flex-direction: column;
+    }
+    .diagram-zone {
+      position: static;
+      flex: none;
+      width: 100%;
+    }
+    .steps-zone {
+      flex: none;
+      width: 100%;
+    }
+    .step {
+      min-height: auto;
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Intersection Observer pour activer chaque étape au scroll
+  const steps = document.querySelectorAll('.step');
+  const allNodes = document.querySelectorAll('.node');
+  const allArrows = document.querySelectorAll('.arrow');
+
+  // Map step → éléments à activer
+  const nodeMap = {};
+  allNodes.forEach(node => {
+    const step = node.dataset.step;
+    if (!nodeMap[step]) nodeMap[step] = [];
+    nodeMap[step].push(node);
+  });
+  const arrowMap = {};
+  allArrows.forEach(arrow => {
+    const step = arrow.dataset.step;
+    if (!arrowMap[step]) arrowMap[step] = [];
+    arrowMap[step].push(arrow);
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const step = entry.target;
+      const stepNum = step.dataset.step;
+
+      if (entry.isIntersecting) {
+        step.classList.add('active');
+
+        // Activer les nœuds correspondant
+        (nodeMap[stepNum] || []).forEach(node => node.classList.add('visible'));
+        (arrowMap[stepNum] || []).forEach(arrow => arrow.classList.add('visible'));
+
+        // Activer aussi les étapes précédentes (cumulatif)
+        for (let i = 1; i < parseInt(stepNum); i++) {
+          (nodeMap[String(i)] || []).forEach(node => node.classList.add('visible'));
+          (arrowMap[String(i)] || []).forEach(arrow => arrow.classList.add('visible'));
+        }
+      } else {
+        step.classList.remove('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  steps.forEach(step => observer.observe(step));
+
+  // Activer la première étape au chargement si visible
+  setTimeout(() => {
+    const firstStep = document.querySelector('.step[data-step="1"]');
+    if (firstStep) {
+      const rect = firstStep.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        firstStep.classList.add('active');
+        (nodeMap['1'] || []).forEach(node => node.classList.add('visible'));
+        (arrowMap['1'] || []).forEach(arrow => arrow.classList.add('visible'));
+      }
+    }
+  }, 100);
+</script>
