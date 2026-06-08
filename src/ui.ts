@@ -6,8 +6,8 @@ const ui = {
   allPosts: 'All Posts →',
   postsEyebrow: 'Archive',
   postsTitle: 'All Posts',
-  heroTitle: 'Keep notes.',
-  heroTitleLine2: '',
+  heroTitle: 'IA & Tech,',
+  heroTitleLine2: 'infra & automatisation.',
   viewAll: 'All Posts →',
   readLink: 'Read →',
   postFeed: {
