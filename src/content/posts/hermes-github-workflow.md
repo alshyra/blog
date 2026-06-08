@@ -28,22 +28,9 @@ C'est beaucoup d'étapes manuelles pour des actions répétitives. Le workflow G
 
 ## L'architecture du workflow
 
-```
-GitHub (issue/PR)
-    │ webhook POST
-    ▼
-Hermes Agent (webhook gateway)
-    │ lit l'issue/PR via gh CLI
-    │ propose un plan dans un commentaire
-    ▼
-Utilisateur lit le plan
-    │ commente "Hermes approve"
-    ▼
-Hermes Agent exécute le plan
-    │ push → CI → merge
-    ▼
-Déploiement automatique
-```
+![Workflow GitHub → Hermes Agent](/diagrams/workflow-architecture.excalidraw.png)
+
+*Le diagramme est éditable — glisse-le sur [excalidraw.com](https://excalidraw.com) pour le modifier.*
 
 ### Le webhook gateway
 
