@@ -64,9 +64,5 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3"
   },
-  "overrides": {
-    "@typescript-eslint/scope-manager": "8.46.3",
-    "@typescript-eslint/types": "8.46.3",
-    "@typescript-eslint/visitor-keys": "8.46.3"
-  }
+  "overrides": {}
 }

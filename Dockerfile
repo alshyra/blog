@@ -2,10 +2,8 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# Install Bun
-RUN apk add --no-cache curl && \
-    curl -fsSL https://bun.sh/install | bash && \
-    mv /root/.bun/bin/bun /usr/local/bin/bun
+# Install Bun via npm (plus fiable que le pipe curl | bash)
+RUN npm install -g bun
 
 # Cache layer : dépendances seules
 COPY package.json bun.lock ./
