@@ -4,6 +4,9 @@
 ---
 
 <div class="scrolly-container">
+  <!-- Barre de progression mobile -->
+  <div class="mobile-progress" aria-hidden="true"></div>
+
   <!-- Zone diagramme sticky -->
   <div class="diagram-zone" aria-label="Diagramme du workflow GitHub → Hermes Agent">
     <svg class="diagram-svg" viewBox="0 0 800 620" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,40 +134,86 @@
   <!-- Zone steps scrollytelling -->
   <div class="steps-zone">
     <div class="step" data-step="1">
+      <span class="step-indicator" style="background:#1971c2"></span>
       <span class="step-number">01</span>
       <h3>Une issue GitHub est ouverte</h3>
       <p>Un bug est signalé, une feature est demandée — le déclencheur classique. Le webhook POST vers Hermes Agent est automatique.</p>
     </div>
 
     <div class="step" data-step="2">
+      <span class="step-indicator" style="background:#6741d9"></span>
       <span class="step-number">02</span>
       <h3>Hermes analyse et poste un plan</h3>
       <p>Le webhook gateway reçoit l'événement, lit l'issue via <code>gh issue view</code>, comprend le contexte, et poste un plan d'implémentation détaillé en commentaire.</p>
     </div>
 
     <div class="step" data-step="3">
+      <span class="step-indicator" style="background:#2f9e44"></span>
       <span class="step-number">03</span>
       <h3>Tu valides (ou pas)</h3>
       <p>Tu lis le plan. Si ça te convient, tu commentes <strong>"Hermes approve"</strong>. Sinon, <strong>"Hermes abort"</strong> annule tout, <strong>"Hermes plan"</strong> regénère.</p>
     </div>
 
     <div class="step" data-step="4">
+      <span class="step-indicator" style="background:#e67700"></span>
       <span class="step-number">04</span>
       <h3>Implémentation automatique</h3>
       <p>Hermes bascule sur une branche <code>feat/issue-N</code>, implémente la solution selon le plan, commit et push. Les tests passent ? On continue.</p>
     </div>
 
     <div class="step" data-step="5">
+      <span class="step-indicator" style="background:#0c8599"></span>
       <span class="step-number">05</span>
       <h3>Pull Request créée</h3>
       <p>Une PR est ouverte avec "Closes #N" dans la description. Le CI se déclenche, la review peut commencer.</p>
     </div>
 
     <div class="step" data-step="6">
+      <span class="step-indicator" style="background:#d9480f"></span>
       <span class="step-number">06</span>
       <h3>Déploiement en production</h3>
       <p>Le merge sur <code>main</code> déclenche GitHub Actions → rsync → docker compose up -d. Le correctif est en ligne, tu n'as pas touché un terminal.</p>
     </div>
+  </div>
+
+  <!-- Diagramme récapitulatif pour mobile -->
+  <div class="mobile-final-diagram">
+    <svg viewBox="0 0 800 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="35" width="100" height="80" rx="6" fill="#a5d8ff" stroke="#1971c2" stroke-width="1.5"/>
+      <text x="60" y="65" text-anchor="middle" fill="#1971c2" font-size="11" font-weight="600">GitHub</text>
+      <text x="60" y="82" text-anchor="middle" fill="#1971c2" font-size="10">Issue / PR</text>
+
+      <line x1="110" y1="75" x2="145" y2="75" stroke="#868e96" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <rect x="150" y="35" width="100" height="80" rx="6" fill="#d0bfff" stroke="#6741d9" stroke-width="1.5"/>
+      <text x="200" y="65" text-anchor="middle" fill="#6741d9" font-size="11" font-weight="600">Hermes</text>
+      <text x="200" y="82" text-anchor="middle" fill="#6741d9" font-size="10">Webhook</text>
+
+      <line x1="250" y1="75" x2="285" y2="75" stroke="#868e96" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <rect x="290" y="35" width="100" height="80" rx="6" fill="#b2f2bb" stroke="#2f9e44" stroke-width="1.5"/>
+      <text x="340" y="65" text-anchor="middle" fill="#2f9e44" font-size="11" font-weight="600">Toi</text>
+      <text x="340" y="82" text-anchor="middle" fill="#2f9e44" font-size="10">Approuves</text>
+
+      <line x1="390" y1="75" x2="425" y2="75" stroke="#868e96" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <rect x="430" y="35" width="100" height="80" rx="6" fill="#fff3bf" stroke="#e67700" stroke-width="1.5"/>
+      <text x="480" y="65" text-anchor="middle" fill="#e67700" font-size="11" font-weight="600">Code</text>
+      <text x="480" y="82" text-anchor="middle" fill="#e67700" font-size="10">Implémente</text>
+
+      <line x1="530" y1="75" x2="565" y2="75" stroke="#868e96" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <rect x="570" y="35" width="100" height="80" rx="6" fill="#c3fae8" stroke="#0c8599" stroke-width="1.5"/>
+      <text x="620" y="65" text-anchor="middle" fill="#0c8599" font-size="11" font-weight="600">PR</text>
+      <text x="620" y="82" text-anchor="middle" fill="#0c8599" font-size="10">Merge</text>
+
+      <line x1="670" y1="75" x2="700" y2="75" stroke="#868e96" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <rect x="700" y="35" width="90" height="80" rx="6" fill="#ffd8a8" stroke="#d9480f" stroke-width="1.5"/>
+      <text x="745" y="65" text-anchor="middle" fill="#d9480f" font-size="11" font-weight="600">🚀</text>
+      <text x="745" y="82" text-anchor="middle" fill="#d9480f" font-size="10">Deploy</text>
+    </svg>
+    <p style="font-size:0.75rem;color:#999;margin-top:0.5rem">Vue d'ensemble du workflow</p>
   </div>
 </div>
 
@@ -192,7 +241,10 @@
     --arrow-color: #868e96;
   }
 
-  /* Styles des nœuds */
+  /* Barre de progression mobile (cachée sur desktop) */
+  .mobile-progress {
+    display: none;
+  }
   .node { opacity: 0; transition: opacity 0.4s ease, filter 0.4s ease; }
   .node.visible { opacity: 1; }
   .node.active .node-bg { filter: url(#glow); }
@@ -256,23 +308,81 @@
     border-radius: 4px;
   }
 
+  /* Indicateur de couleur pour chaque étape (mobile) */
+  .step-indicator {
+    display: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Diagramme compact mobile (visible en fin de scroll) */
+  .mobile-final-diagram {
+    display: none;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .scrolly-container {
       flex-direction: column;
     }
+
     .diagram-zone {
-      position: static;
-      flex: none;
-      width: 100%;
+      display: none; /* Caché au scroll, trop petit */
     }
+
+    /* Barre de progression mobile */
+    .mobile-progress {
+      display: block;
+      position: sticky;
+      top: 52px;
+      z-index: 10;
+      height: 4px;
+      border-radius: 2px;
+      background: #e9ecef;
+      overflow: hidden;
+    }
+
+    .mobile-progress::after {
+      content: '';
+      display: block;
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg,
+        #1971c2, #6741d9, #2f9e44, #e67700, #0c8599, #d9480f
+      );
+      transition: width 0.1s linear;
+      width: calc(var(--scroll-progress, 0) * 100%);
+    }
+
     .steps-zone {
       flex: none;
       width: 100%;
+      padding-top: 0;
     }
+
     .step {
       min-height: auto;
-      padding: 1.5rem 1rem;
+      padding: 2rem 0.5rem;
+    }
+
+    .step-indicator {
+      display: block;
+    }
+
+    /* Diagramme final en pied de section */
+    .mobile-final-diagram {
+      display: block;
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .mobile-final-diagram img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 1px solid var(--separator, #ddd);
     }
   }
 </style>
@@ -334,4 +444,18 @@
       }
     }
   }, 100);
+
+  // Mise à jour de la barre de progression mobile
+  const updateProgress = () => {
+    const container = document.querySelector('.scrolly-container');
+    const bar = document.querySelector('.mobile-progress');
+    if (!container || !bar || window.innerWidth > 768) return;
+    const rect = container.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    if (total <= 0) return;
+    const progress = Math.min(1, Math.max(0, -rect.top / total));
+    container.style.setProperty('--scroll-progress', progress);
+  };
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
 </script>
