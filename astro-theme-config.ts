@@ -6,49 +6,39 @@ type NavItem = {
 /**
  * astro-theme-config.ts
  *
- * Central configuration for the Tone theme.
- * Most site-level customization should happen in this file.
+ * Central configuration for the blog.
  */
 
 const config = {
   site: {
-    /** Production origin, used for canonical links, sitemap, and Open Graph metadata. */
-    url: 'https://example.com',
-    /** Subpath such as '/repo-name'. Keep empty when deploying at a domain root. */
+    url: 'https://blog.alshyra.fr',
     base: '',
-    lang: 'en',
-    locale: 'en_US',
-    dateLocale: 'en-US',
-    title: 'Tone',
-    logoLabel: 'Tone',
-    description: 'A minimal Astro theme for posts and notes.',
-    author: 'Alex Morgan',
-    /** Optional absolute or root-relative image URL for homepage/search/about social previews. */
+    lang: 'fr',
+    locale: 'fr_FR',
+    dateLocale: 'fr-FR',
+    title: 'alshyra — IA & Tech',
+    logoLabel: 'alshyra',
+    description: 'Blog technique sur l\'IA, le DevOps et l\'infrastructure auto-hébergée.',
+    author: 'Antoine Savajols',
     defaultOgImage: '/og.png',
   },
 
-  // The logo already links to `/`. Add items here if you want visible header links.
-  // Example: [{ label: 'Posts', href: '/posts' }, { label: 'About', href: '/about' }]
   nav: [] as NavItem[],
 
-  // Footer links stay visible by default so readers have a stable way to move around.
   footerNav: [
-    { label: 'Posts', href: '/posts' },
-    { label: 'About', href: '/about' },
-    { label: 'Search', href: '/search' },
+    { label: 'Articles', href: '/posts' },
+    { label: 'À propos', href: '/about' },
+    { label: 'Recherche', href: '/search' },
   ] as NavItem[],
 
   content: {
     categoryOrder: [
-      'Design',
-      'Getting Started',
-      'Markdown',
-      'Open Source',
-      'Systems',
+      'IA',
+      'DevOps',
+      'Infrastructure',
+      'Hermes',
+      'Astro',
       'Notes',
-      'Research',
-      'Performance',
-      'MDX',
     ],
   },
 
@@ -57,11 +47,6 @@ const config = {
   },
 
   comments: {
-    // One-line switch after you fill the giscus values:
-    // mode: 'off'           -> no comments
-    // mode: 'giscus'        -> original giscus theme
-    // mode: 'giscus-custom' -> Tone custom giscus theme
-    // Local preview can also use PUBLIC_GISCUS_MODE and PUBLIC_GISCUS_* in .env.local.
     mode: 'off',
     provider: 'giscus',
     giscus: {
@@ -77,59 +62,59 @@ const config = {
       theme: 'preferred_color_scheme',
       customLightTheme: '/giscus-light.css',
       customDarkTheme: '/giscus-dark.css',
-      lang: 'en',
+      lang: 'fr',
       loading: 'eager',
     },
   },
 
   social: {
-    website: 'https://hanityx.github.io/astro-tone/', // e.g. 'https://your-site.com'
-    email: '', // e.g. 'hello@your-site.com'
-    linkedin: '', // e.g. 'https://www.linkedin.com/in/yourhandle'
-    github: 'https://github.com/hanityx/astro-tone', // e.g. 'https://github.com/yourhandle'
+    website: 'https://blog.alshyra.fr',
+    email: 'antoine.savajols@gmail.com',
+    linkedin: '',
+    github: 'https://github.com/alshyra',
   },
 
   about: {
-    /** Profile image URL. Leave empty to use the text-only About layout. */
     profileImage: '',
-    name: 'Alex Morgan',
-    role: 'Writes about useful small tools and the notes behind them.',
-    location: 'Anywhere',
-    focus: 'Writing, small tools, and notes worth returning to.',
-    lead: 'Alex writes about small product decisions, interface craft, and the notes that make work easier to return to.',
-    headline: ['Made to', 'last.'],
-    statementLabel: 'Work',
-    statementTitle: 'Notes on making useful things.',
+    name: 'Antoine Savajols',
+    role: 'Product Builder — IA, DevOps, infra auto-hébergée.',
+    location: 'France',
+    focus: 'IA, automatisation, infrastructure, et tout ce qui se construit.',
+    lead: 'Je construis des produits, j\'automatise ce qui peut l\'être, et j\'écris sur ce que j\'apprends en chemin.',
+    headline: ['Construire,', 'automatiser,', 'partager.'],
+    statementLabel: 'Travail',
+    statementTitle: 'Engineering & Product.',
     statement:
-      'This page is intentionally spare: a short bio, a few links, and enough context for readers who want to know who is writing.',
-    careerLabel: 'Career',
+      'Product Builder avec une passion pour l\'infrastructure auto-hébergée, l\'IA, et les workflows qui tiennent la route. J\'aime construire des systèmes simples qui marchent — et écrire pour clarifier ma pensée.',
+    careerLabel: 'Parcours',
     career: [
       {
-        period: 'Current',
-        title: 'Independent practice',
+        period: '2025 — Aujourd\'hui',
+        title: 'Product Builder — Indépendant',
         description:
-          'Designing calm interfaces, writing field notes, and helping teams clarify product surfaces.',
+          'Consulting en architecture logicielle, infrastructure, et automatisation. Stack : TypeScript, Python, Go, K8s, Docker.',
       },
       {
-        period: 'Selected',
-        title: 'Product systems',
+        period: '2023 — 2025',
+        title: 'Lead DevOps / Fullstack',
         description:
-          'Worked across design systems, editorial tooling, and early-stage product foundations.',
+          'DevOps, K8s/Helm, Keycloak SSO, Backend Python/Go, Frontend Vue/React, CI/CD, monitoring VictoriaMetrics.',
       },
       {
-        period: 'Elsewhere',
-        title: 'Writing and reference',
+        period: '2019 — 2023',
+        title: 'Ingénieur DevOps & Fullstack',
         description:
-          'Keeping a public archive of notes, examples, and references worth returning to.',
+          'Migration AngularJS→TypeScript, mise en place GitOps, automatisation d\'infrastructure, et refonte de pipelines CI/CD.',
       },
     ],
     interests: [
-      'Interface systems that stay quiet until needed',
-      'Writing as a way to keep product judgment visible',
-      'Tools and habits that make long work easier to resume',
+      'IA générative et agents autonomes',
+      'Infrastructure reproductible et auto-hébergée',
+      'Automatisation des workflows',
+      'Danser la gavotte entre deux déploiements',
     ],
-    interestsLabel: 'Interests',
-    interestsHeading: 'What the work keeps returning to',
+    interestsLabel: 'Centres d\'intérêt',
+    interestsHeading: 'Ce qui me fait avancer',
   },
 };
 

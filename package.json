@@ -1,19 +1,19 @@
 {
-  "name": "astro-tone",
-  "description": "Typography-first Astro blog starter with quiet design, built-in search, and publishing defaults.",
+  "name": "blog",
+  "description": "Blog IA & Tech — alshyra.fr",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "author": "hanityx",
+  "author": "alshyra",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hanityx/astro-tone.git"
+    "url": "git+https://github.com/alshyra/blog.git"
   },
   "bugs": {
-    "url": "https://github.com/hanityx/astro-tone/issues"
+    "url": "https://github.com/alshyra/blog/issues"
   },
-  "homepage": "https://hanityx.github.io/astro-tone/",
+  "homepage": "https://blog.alshyra.fr",
   "keywords": [
     "astro",
     "withastro",
@@ -67,9 +67,6 @@
   "overrides": {
     "@typescript-eslint/scope-manager": "8.46.3",
     "@typescript-eslint/types": "8.46.3",
-    "@typescript-eslint/visitor-keys": "8.46.3",
-    "yaml-language-server": {
-      "yaml": "2.8.4"
-    }
+    "@typescript-eslint/visitor-keys": "8.46.3"
   }
 }
