@@ -36,13 +36,13 @@
   .scrolly {
     position: relative;
     max-width: 600px;
-    margin: var(--space-8) auto;
+    margin: 0 auto;
   }
 
   /* ---- Le chat sticky ---- */
   .scrolly__sticky {
     position: sticky;
-    top: var(--space-8);
+    top: 0;
     z-index: 10;
   }
 
@@ -52,8 +52,7 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
-    min-height: 50vh;
-    max-height: 80vh;
+    height: 100vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -230,9 +229,9 @@
 
   /* ---- Responsive ---- */
   @media (max-width: 768px) {
-    .scrolly { margin: var(--space-4) auto; }
-    .scrolly__sticky { top: var(--space-4); }
-    .chat-window { min-height: 45vh; max-height: 75vh; border-radius: var(--radius-md); }
+    .scrolly { margin: 0; }
+    .scrolly__sticky { top: 0; }
+    .chat-window { height: 100vh; border-radius: 0; }
     .scrolly__step { min-height: 40vh; }
   }
 
