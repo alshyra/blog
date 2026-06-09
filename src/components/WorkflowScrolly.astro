@@ -1,0 +1,492 @@
+---
+// WorkflowScrolly.astro — Chat sticky + scrollytelling
+// Le cadre reste fixe, les messages apparaissent au scroll
+---
+
+<section class="scrolly">
+  <!-- Le chat sticky (reste fixe) -->
+  <div class="scrolly__sticky">
+    <div class="chat-window">
+      <div class="chat-window__header">
+        <div class="chat-window__dot"></div>
+        <div class="chat-window__title">Hermes Agent</div>
+        <div class="chat-window__status">
+          <span class="chat-window__status-dot"></span>
+          en ligne
+        </div>
+      </div>
+      <div class="chat-window__messages" id="chat-messages">
+        <!-- Les messages apparaissent ici via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Les steps (déclencheurs de scroll) -->
+  <div class="scrolly__steps">
+    <!-- Step 1 : Issue créée -->
+    <div class="scrolly__step" data-step="1">
+      <div class="scrolly__step-content">
+        <div class="step-num">01</div>
+        <h3>L'issue est créée</h3>
+        <p>Sur iOS Safari et Chrome Android, le bouton de login est coupé en bas de l'écran.</p>
+      </div>
+    </div>
+
+    <!-- Step 2 : "hermes plan" -->
+    <div class="scrolly__step" data-step="2">
+      <div class="scrolly__step-content">
+        <div class="step-num">02</div>
+        <h3>Tu lances le plan</h3>
+        <p>Tu tapes <code>hermes plan</code> en commentaire de l'issue. Le webhook contacte Hermes.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 : Bot répond -->
+    <div class="scrolly__step" data-step="3">
+      <div class="scrolly__step-content">
+        <div class="step-num">03</div>
+        <h3>Hermes analyse</h3>
+        <p>Il lit l'issue via <code>gh issue view</code>, analyse le code, et propose un plan.</p>
+      </div>
+    </div>
+
+    <!-- Step 4 : Approve -->
+    <div class="scrolly__step" data-step="4">
+      <div class="scrolly__step-content">
+        <div class="step-num">04</div>
+        <h3>Tu valides</h3>
+        <p><code>Hermes approve</code> — il crée la branche, code la correction, commit et push.</p>
+      </div>
+    </div>
+
+    <!-- Step 5 : PR -->
+    <div class="scrolly__step" data-step="5">
+      <div class="scrolly__step-content">
+        <div class="step-num">05</div>
+        <h3>PR ouverte</h3>
+        <p>PR <strong>#43</strong> ouverte avec <em>"Closes #42"</em>. Le merge déclenche le déploiement.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .scrolly {
+    position: relative;
+    max-width: var(--max-width-content);
+    margin: var(--space-8) auto;
+  }
+
+  /* ---- Le chat sticky ---- */
+  .scrolly__sticky {
+    position: sticky;
+    top: var(--space-8);
+    z-index: 10;
+    margin-bottom: var(--space-4);
+  }
+
+  .chat-window {
+    background: var(--bg-secondary);
+    border: 1px solid var(--separator);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    max-height: 420px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-window__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--fill-quaternary);
+    border-bottom: 1px solid var(--separator);
+    font-size: var(--text-subheadline);
+    font-weight: var(--weight-semibold);
+    color: var(--label-primary);
+    flex-shrink: 0;
+  }
+
+  .chat-window__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  .chat-window__title {
+    flex: 1;
+  }
+
+  .chat-window__status {
+    font-size: var(--text-footnote);
+    font-weight: var(--weight-regular);
+    color: var(--label-tertiary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .chat-window__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-success);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  .chat-window__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    scroll-behavior: smooth;
+  }
+
+  .chat-window__messages::-webkit-scrollbar {
+    width: 4px;
+  }
+  .chat-window__messages::-webkit-scrollbar-thumb {
+    background: var(--separator);
+    border-radius: var(--radius-full);
+  }
+
+  /* ---- Messages dans le chat ---- */
+  .chat-msg {
+    display: flex;
+    gap: var(--space-3);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+  }
+  .chat-msg.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .chat-msg__avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .chat-msg--user .chat-msg__avatar {
+    background: var(--fill-secondary);
+  }
+  .chat-msg--bot .chat-msg__avatar {
+    background: var(--fill-primary);
+  }
+
+  .chat-msg__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chat-msg__name {
+    font-size: var(--text-caption-1);
+    font-weight: var(--weight-semibold);
+    color: var(--label-primary);
+    margin-bottom: 2px;
+  }
+
+  .chat-msg__name span {
+    font-weight: var(--weight-regular);
+    color: var(--label-tertiary);
+    font-size: var(--text-caption-2);
+    margin-left: var(--space-1);
+  }
+
+  .chat-msg__text {
+    font-size: var(--text-callout);
+    line-height: var(--leading-relaxed);
+    color: var(--label-secondary);
+    background: var(--fill-quaternary);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border-top-left-radius: var(--radius-xs);
+  }
+
+  .chat-msg--user .chat-msg__text {
+    background: var(--fill-secondary);
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-xs);
+  }
+
+  .chat-msg__text code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--fill-quaternary);
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius-xs);
+  }
+
+  .chat-msg__text strong {
+    color: var(--label-primary);
+  }
+
+  .chat-msg__text .text-muted {
+    opacity: 0.6;
+    font-size: var(--text-subheadline);
+  }
+
+  .chat-msg__tag {
+    font-size: var(--text-caption-2);
+    color: var(--label-tertiary);
+    font-style: italic;
+    margin-top: var(--space-2);
+  }
+
+  /* ---- Typing indicator ---- */
+  .typing-dots {
+    display: inline-flex;
+    gap: 4px;
+    padding: var(--space-2) 0;
+  }
+  .typing-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--label-tertiary);
+    animation: dotBounce 1.2s ease-in-out infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes dotBounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ---- Steps (déclencheurs) ---- */
+  .scrolly__steps {
+    position: relative;
+    z-index: 1;
+  }
+
+  .scrolly__step {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: var(--space-8) 0;
+  }
+
+  .scrolly__step-content {
+    background: var(--bg-primary);
+    border: 1px solid var(--separator);
+    border-radius: var(--radius-md);
+    padding: var(--space-5) var(--space-6);
+    max-width: 320px;
+    box-shadow: var(--shadow-md);
+    opacity: 0.3;
+    transform: translateY(8px);
+    transition: opacity var(--duration-normal) var(--ease-out),
+                transform var(--duration-normal) var(--ease-out);
+  }
+
+  .scrolly__step.active .scrolly__step-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .step-num {
+    font-size: var(--text-caption-1);
+    font-weight: var(--weight-bold);
+    color: var(--color-accent);
+    letter-spacing: var(--tracking-wide);
+    margin-bottom: var(--space-2);
+  }
+
+  .scrolly__step-content h3 {
+    font-size: var(--text-headline);
+    font-weight: var(--weight-semibold);
+    color: var(--label-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .scrolly__step-content p {
+    font-size: var(--text-subheadline);
+    color: var(--label-secondary);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+  }
+
+  .scrolly__step-content code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--fill-quaternary);
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius-xs);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 768px) {
+    .scrolly__sticky {
+      top: var(--space-4);
+    }
+    .chat-window {
+      max-height: 320px;
+      border-radius: var(--radius-md);
+    }
+    .scrolly__step {
+      min-height: 40vh;
+      justify-content: center;
+    }
+    .scrolly__step-content {
+      max-width: 280px;
+      padding: var(--space-4);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chat-msg {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .scrolly__step-content {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .typing-dots span {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+(function() {
+  const messages = [
+    // step 1 : issue créée (pas de message chat, juste l'issue)
+    null,
+    // step 2 : "hermes plan"
+    {
+      type: 'user',
+      name: 'alshyra',
+      text: 'hermes plan'
+    },
+    // step 3 : bot répond
+    {
+      type: 'bot',
+      name: 'alshyra-bot',
+      text: '<strong>Plan d\'implémentation :</strong><br><br>1. Corriger le media query dans <code>src/styles/login.css</code><br>2. Ajouter <code>env(safe-area-inset-bottom)</code><br>3. Tester sur 375px et 768px<br>4. Ouvrir une PR',
+      tag: '<!-- hermes -->'
+    },
+    // step 4 : "Hermes approve"
+    {
+      type: 'user',
+      name: 'alshyra',
+      text: 'Hermes approve'
+    },
+    // step 5 : PR créée
+    {
+      type: 'bot',
+      name: 'alshyra-bot',
+      text: '✅ Branch <code>feat/issue-42</code> créée<br>✅ Correction du media query appliquée<br>✅ PR <strong>#43</strong> ouverte — <em>"Closes #42"</em><br><br><span class="text-muted">🚀 Le merge déclenche GitHub Actions → docker compose up -d</span>',
+      tag: '<!-- hermes -->'
+    }
+  ];
+
+  const chatMessages = document.getElementById('chat-messages');
+  if (!chatMessages) return;
+
+  let currentStep = 0;
+
+  function addMessage(msg) {
+    const div = document.createElement('div');
+    div.className = `chat-msg chat-msg--${msg.type}`;
+    div.innerHTML = `
+      <div class="chat-msg__avatar">${msg.type === 'user' ? '👤' : '🤖'}</div>
+      <div class="chat-msg__body">
+        <div class="chat-msg__name">${msg.name} <span>à l'instant</span></div>
+        <div class="chat-msg__text">${msg.text}</div>
+        ${msg.tag ? `<div class="chat-msg__tag">${msg.tag}</div>` : ''}
+      </div>
+    `;
+    chatMessages.appendChild(div);
+
+    // Animate in
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        div.classList.add('visible');
+      });
+    });
+
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function addTypingIndicator() {
+    const div = document.createElement('div');
+    div.className = 'chat-msg chat-msg--bot';
+    div.id = 'typing-indicator';
+    div.innerHTML = `
+      <div class="chat-msg__avatar">🤖</div>
+      <div class="chat-msg__body">
+        <div class="chat-msg__name">alshyra-bot <span>en train d'écrire...</span></div>
+        <div class="chat-msg__text">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    `;
+    chatMessages.appendChild(div);
+    div.classList.add('visible');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+  }
+
+  function onStepEnter(stepNum) {
+    if (stepNum <= currentStep) return;
+    currentStep = stepNum;
+
+    const msg = messages[stepNum - 1];
+    if (!msg) return;
+
+    // Show typing indicator for bot messages
+    if (msg.type === 'bot') {
+      addTypingIndicator();
+      setTimeout(() => {
+        removeTypingIndicator();
+        addMessage(msg);
+      }, 800);
+    } else {
+      addMessage(msg);
+    }
+  }
+
+  // IntersectionObserver for steps
+  const steps = document.querySelectorAll('.scrolly__step');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const step = parseInt(entry.target.dataset.step);
+        entry.target.classList.add('active');
+        onStepEnter(step);
+      }
+    });
+  }, { threshold: 0.6 });
+
+  steps.forEach(step => observer.observe(step));
+})();
+</script>
