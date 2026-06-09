@@ -124,9 +124,9 @@
       </g>
 
       <!-- Légendes (toujours visibles) -->
-      <g class="legend" opacity="0.6">
-        <text x="40" y="560" fill="#999" font-size="11">Carré <!-- hermes --> anti-boucle</text>
-        <text x="460" y="560" fill="#999" font-size="11">Vérification sender.login</text>
+      <g class="legend">
+        <text x="40" y="560" class="legend-text" font-size="12">🛡️ Anti-boucle : &lt;!-- hermes --&gt;</text>
+        <text x="460" y="560" class="legend-text" font-size="12">🔒 Sécurité : vérification sender</text>
       </g>
     </svg>
   </div>
@@ -239,12 +239,38 @@
     width: 100%;
     height: auto;
     --arrow-color: #868e96;
+    background: var(--bg-primary, #fff);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .diagram-svg {
+      background: var(--bg-secondary, #1a1a2e);
+    }
+  }
+  [data-theme="dark"] .diagram-svg {
+    background: var(--bg-secondary, #1a1a2e);
   }
 
   /* Barre de progression mobile (cachée sur desktop) */
   .mobile-progress {
     display: none;
   }
+
+  /* Légende SVG — adaptée au dark mode */
+  .legend-text {
+    fill: var(--label-secondary, #666);
+    font-weight: 500;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .legend-text {
+      fill: var(--label-secondary, #adb5bd);
+    }
+  }
+  [data-theme="dark"] .legend-text {
+    fill: var(--label-secondary, #adb5bd);
+  }
+
   .node { opacity: 0; transition: opacity 0.4s ease, filter 0.4s ease; }
   .node.visible { opacity: 1; }
   .node.active .node-bg { filter: url(#glow); }
