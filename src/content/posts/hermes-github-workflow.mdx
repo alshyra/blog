@@ -9,7 +9,7 @@ homeOrder: 1
 ---
 import WorkflowDiagram from '../../components/WorkflowDiagram.astro';
 
-**TL;DR** — Copilot cloud agent propose un workflow agentique (planifier, implémenter, PR) qui consomme des AI Credits à chaque étape. Hermes Agent fait exactement la même chose — webhook → plan → approve → implémente → merge — sur ton propre serveur. Coût fixe, pas de quota.
+**TL;DR** — Copilot cloud agent propose un workflow agentique (planifier, implémenter, PR) qui consomme des AI Credits à chaque étape. Hermes Agent fait la même chose sur ton infra : tu paies tes propres tokens API (OpenRouter, etc.), tu choisis ton modèle, et le VPS tourne pour 5€/mois. Pas de quota arbitraire, pas de "plus de crédits".
 
 ---
 
@@ -19,13 +19,12 @@ Depuis le 1er juin 2026, GitHub Copilot est passé en facturation à l'usage. Ch
 
 - **Copilot Pro** : 10$/mois, dont 10$ de crédits AI
 - **Copilot Pro+** : 39$/mois, dont 39$ de crédits AI
-- **1 crédit AI** = 0,01$ (une seule requête agent peut en coûter plusieurs)
+- **1 crédit AI** = 0,01$
+- Les complétions de code restent illimitées — ça n'a pas changé. Mais les *features agentiques* — là où Copilot planifie, réfléchit, exécute en plusieurs étapes — consomment des crédits à chaque appel.
 
-Les complétions de code restent illimitées — ça n'a pas changé. Mais les features *agentiques*[^1] — là où Copilot planifie, réfléchit, exécute en plusieurs étapes — consomment des crédits à chaque tour.
+Depuis un peu plus d'un an, je code quasi exclusivement via le mode agent de Copilot. C'est là que le bât blesse : cet usage-là fait fondre le budget crédits en quelques jours, pas les complétions dans l'IDE.
 
-Une après-midi à faire bosser un Cloud Agent sur des issues GitHub, et le budget crédits du mois peut y passer.
-
-[^1]: *Agentique* : un workflow où l'IA ne se contente pas de répondre, mais planifie, exécute des actions, itère jusqu'à un résultat. C'est ce qui différencie un chatbot d'un véritable assistant de développement.
+Une après-midi à faire bosser un cloud agent sur des issues GitHub, et le budget crédits du mois peut y passer.
 
 ---
 
