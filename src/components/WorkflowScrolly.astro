@@ -262,34 +262,40 @@
 
 <script>
 (function() {
-  // Séquence complète : messages + annotations
-  const sequence = [
-    // Step 1 : Issue créée (annotation seule)
-    { type: 'annotation', text: '🔵 Issue ouverte — le webhook contacte Hermes via <code>/webhooks/rpg-issues</code>' },
-
+  // Chaque step = un groupe (annotation + message)
+  const groups = [
+    // Step 1 : Issue
+    [
+      { type: 'annotation', text: '🔵 Issue ouverte — le webhook contacte Hermes via <code>/webhooks/rpg-issues</code>' },
+    ],
     // Step 2 : "hermes plan"
-    { type: 'user', name: 'alshyra', text: 'hermes plan' },
-    { type: 'annotation', text: '→ Hermes identifie la commande, lit l\'issue via <code>gh issue view</code>' },
-
+    [
+      { type: 'user', name: 'alshyra', text: 'hermes plan' },
+      { type: 'annotation', text: '→ Hermes identifie la commande, lit l\'issue via <code>gh issue view</code>' },
+    ],
     // Step 3 : Bot répond
-    { type: 'bot', name: 'alshyra-bot',
-      text: '<strong>Plan d\'implémentation :</strong><br><br>1. Corriger le media query dans <code>src/styles/login.css</code><br>2. Ajouter <code>env(safe-area-inset-bottom)</code><br>3. Tester sur 375px et 768px<br>4. Ouvrir une PR',
-      tag: '<!-- hermes -->' },
-
+    [
+      { type: 'bot', name: 'alshyra-bot',
+        text: '<strong>Plan d\'implémentation :</strong><br><br>1. Corriger le media query dans <code>src/styles/login.css</code><br>2. Ajouter <code>env(safe-area-inset-bottom)</code><br>3. Tester sur 375px et 768px<br>4. Ouvrir une PR',
+        tag: '<!-- hermes -->' },
+    ],
     // Step 4 : Approve
-    { type: 'user', name: 'alshyra', text: 'Hermes approve' },
-    { type: 'annotation', text: '→ Hermes crée la branche <code>feat/issue-42</code>, code, commit, push' },
-
+    [
+      { type: 'user', name: 'alshyra', text: 'Hermes approve' },
+      { type: 'annotation', text: '→ Hermes crée la branche <code>feat/issue-42</code>, code, commit, push' },
+    ],
     // Step 5 : PR
-    { type: 'bot', name: 'alshyra-bot',
-      text: '✅ Branch <code>feat/issue-42</code> créée<br>✅ Correction du media query<br>✅ PR <strong>#43</strong> ouverte — <em>"Closes #42"</em><br><br><span class="text-muted">🚀 Merge → GitHub Actions → docker compose up -d</span>',
-      tag: '<!-- hermes -->' },
+    [
+      { type: 'bot', name: 'alshyra-bot',
+        text: '✅ Branch <code>feat/issue-42</code> créée<br>✅ Correction du media query<br>✅ PR <strong>#43</strong> ouverte — <em>"Closes #42"</em><br><br><span class="text-muted">🚀 Merge → GitHub Actions → docker compose up -d</span>',
+        tag: '<!-- hermes -->' },
+    ],
   ];
 
   const chatMessages = document.getElementById('chat-messages');
   if (!chatMessages) return;
 
-  let currentIndex = 0;
+  let currentGroup = 0;
 
   function addMessage(msg) {
     const div = document.createElement('div');
@@ -337,35 +343,44 @@
     if (el) el.remove();
   }
 
-  function advanceSequence() {
-    if (currentIndex >= sequence.length) return;
-
-    const item = sequence[currentIndex];
-    currentIndex++;
-
-    if (item.type === 'annotation') {
-      addAnnotation(item.text);
-    } else if (item.type === 'bot') {
-      addTypingIndicator();
-      setTimeout(() => {
-        removeTypingIndicator();
+  function processItem(item) {
+    return new Promise(resolve => {
+      if (item.type === 'annotation') {
+        addAnnotation(item.text);
+        setTimeout(resolve, 300);
+      } else if (item.type === 'bot') {
+        addTypingIndicator();
+        setTimeout(() => {
+          removeTypingIndicator();
+          addMessage(item);
+          resolve();
+        }, 800);
+      } else {
         addMessage(item);
-      }, 800);
-    } else {
-      addMessage(item);
+        setTimeout(resolve, 300);
+      }
+    });
+  }
+
+  async function advanceGroup() {
+    if (currentGroup >= groups.length) return;
+    const items = groups[currentGroup];
+    currentGroup++;
+    for (const item of items) {
+      await processItem(item);
     }
   }
 
   // IntersectionObserver — chaque step déclenche un élément de la séquence
   const steps = document.querySelectorAll('.scrolly__step');
-  let activeSteps = new Set();
+  let triggeredSteps = new Set();
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const stepNum = parseInt(entry.target.dataset.step);
-      if (entry.isIntersecting && !activeSteps.has(stepNum)) {
-        activeSteps.add(stepNum);
-        advanceSequence();
+      if (entry.isIntersecting && !triggeredSteps.has(stepNum)) {
+        triggeredSteps.add(stepNum);
+        advanceGroup();
       }
     });
   }, { threshold: 0.5 });
