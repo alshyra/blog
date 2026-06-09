@@ -1,6 +1,6 @@
 ---
-title: "Remplacer Copilot Cloud Agent par un workflow Hermes auto-hébergé"
-description: "GitHub Copilot Cloud Agent c'est génial, mais aux crédits ça coûte vite cher. Voilà comment obtenir la même chose — plan, approve, implémente, PR — avec Hermes Agent, pour le prix d'un VPS."
+title: "Remplacer Copilot cloud agent par un workflow Hermes auto-hébergé"
+description: "GitHub Copilot cloud agent c'est génial, mais aux crédits ça coûte vite cher. Voilà comment obtenir la même chose — plan, approve, implémente, PR — avec Hermes Agent, pour le prix d'un VPS."
 pubDate: 2026-06-08
 category: "Hermes"
 homeFeatured: true
@@ -9,13 +9,13 @@ homeOrder: 1
 ---
 import WorkflowDiagram from '../../components/WorkflowDiagram.astro';
 
-**TL;DR** — Copilot Cloud Agent propose un workflow agentique (planifier, implémenter, PR) qui consomme des AI Credits à chaque étape. Hermes Agent fait exactement la même chose — webhook → plan → approve → implémente → merge — sur ton propre serveur. Coût fixe, pas de quota.
+**TL;DR** — Copilot cloud agent propose un workflow agentique (planifier, implémenter, PR) qui consomme des AI Credits à chaque étape. Hermes Agent fait exactement la même chose — webhook → plan → approve → implémente → merge — sur ton propre serveur. Coût fixe, pas de quota.
 
 ---
 
 ## Le constat
 
-Depuis le 1er juin 2026, GitHub Copilot est passé en facturation à l'usage. Chaque interaction avec les fonctionnalités agent (Copilot Cloud Agent, agent mode, code review) consomme des GitHub AI Credits. Concrètement :
+Depuis le 1er juin 2026, GitHub Copilot est passé en facturation à l'usage. Chaque interaction avec les fonctionnalités agent (Copilot cloud agent, agent mode, code review) consomme des GitHub AI Credits. Concrètement :
 
 - **Copilot Pro** : 10$/mois, dont 10$ de crédits AI
 - **Copilot Pro+** : 39$/mois, dont 39$ de crédits AI
@@ -29,9 +29,9 @@ Une après-midi à faire bosser un Cloud Agent sur des issues GitHub, et le budg
 
 ---
 
-## Ce que Copilot Cloud Agent fait de bien, et ce que Hermes reproduit
+## Ce que j'aime dans Copilot cloud agent
 
-Copilot Cloud Agent sait :
+Copilot cloud agent sait :
 - Analyser une issue GitHub
 - Proposer un plan d'implémentation
 - Exécuter les changements
@@ -39,7 +39,7 @@ Copilot Cloud Agent sait :
 
 Hermes Agent aussi — via un déclencheur webhook, un prompt bien conçu, et un workflow en commentaires GitHub. La différence ? Hermes tourne sur ton infra, pas sur des crédits.
 
-| Fonctionnalité | Copilot Cloud Agent | Hermes Agent |
+| Fonctionnalité | Copilot cloud agent | Hermes Agent |
 |---|---|---|
 | Analyse d'issue | ✅ crédits | ✅ VPS |
 | Plan d'implémentation | ✅ crédits | ✅ VPS |
@@ -55,7 +55,7 @@ Hermes Agent aussi — via un déclencheur webhook, un prompt bien conçu, et un
 
 <WorkflowDiagram />
 
-*Le diagramme révèle chaque étape au scroll — exactement le même flux que Copilot Cloud Agent, mais sur ton matos.*
+*Le diagramme révèle chaque étape au scroll — exactement le même flux que Copilot cloud agent, mais sur ton matos.*
 
 ### Le webhook gateway
 
@@ -153,4 +153,4 @@ Le dépôt contient le prompt, la configuration webhook, le système de second b
 
 ---
 
-*Tu utilises Copilot Cloud Agent ? Tu as déjà checké ton crédit restant ce mois-ci ?*
+*Tu utilises Copilot cloud agent ? Tu as déjà checké ton crédit restant ce mois-ci ?*
