@@ -52,7 +52,9 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
-    max-height: 440px;
+    min-height: 50vh;
+    max-height: 80vh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -102,14 +104,7 @@
     padding: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    scroll-behavior: smooth;
-  }
-
-  .chat-window__messages::-webkit-scrollbar { width: 4px; }
-  .chat-window__messages::-webkit-scrollbar-thumb {
-    background: var(--separator);
-    border-radius: var(--radius-full);
+    overflow: hidden;
   }
 
   /* ---- Messages ---- */
@@ -237,7 +232,7 @@
   @media (max-width: 768px) {
     .scrolly { margin: var(--space-4) auto; }
     .scrolly__sticky { top: var(--space-4); }
-    .chat-window { max-height: 350px; border-radius: var(--radius-md); }
+    .chat-window { min-height: 45vh; max-height: 75vh; border-radius: var(--radius-md); }
     .scrolly__step { min-height: 40vh; }
   }
 
