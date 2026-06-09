@@ -1,0 +1,329 @@
+---
+// WorkflowChat.astro — Parcours visuel du workflow Hermes
+// Simule une conversation GitHub issue avec annotations
+---
+
+<div class="workflow-chat">
+  <!-- Frame 1 : Issue créée -->
+  <div class="frame" data-frame="1">
+    <div class="frame-label">01 — L'issue est créée</div>
+    <div class="github-issue">
+      <div class="issue-header">
+        <span class="issue-icon">🔵</span>
+        <span class="issue-title">Le bouton de login ne fonctionne plus sur mobile</span>
+        <span class="issue-badge">opened</span>
+      </div>
+      <div class="issue-body">
+        <p>Sur iOS Safari et Chrome Android, le bouton de login est coupé en bas de l'écran. Le media query ne prend pas en compte les.Safe-Area-Inset.</p>
+      </div>
+    </div>
+    <div class="annotation">
+      <span class="annotation-icon">→</span>
+      <span>Le webhook GitHub envoie une notification à Hermes Agent via <code>/webhooks/rpg-issues</code></span>
+    </div>
+  </div>
+
+  <!-- Frame 2 : User tape "hermes plan" -->
+  <div class="frame" data-frame="2">
+    <div class="frame-label">02 — Tu lances le plan</div>
+    <div class="comment-thread">
+      <div class="comment comment-user">
+        <div class="comment-avatar">👤</div>
+        <div class="comment-content">
+          <div class="comment-author">alshyra <span class="comment-time">il y a 2 min</span></div>
+          <div class="comment-text">hermes plan</div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">
+      <span class="annotation-icon">→</span>
+      <span>Hermes reçoit le commentaire, identifie la commande <code>hermes plan</code>, et lance l'analyse</span>
+    </div>
+  </div>
+
+  <!-- Frame 3 : Bot répond avec un plan -->
+  <div class="frame" data-frame="3">
+    <div class="frame-label">03 — Hermes analyse et propose</div>
+    <div class="comment-thread">
+      <div class="comment comment-bot">
+        <div class="comment-avatar">🤖</div>
+        <div class="comment-content">
+          <div class="comment-author">alshyra-bot <span class="comment-time">il y a 1 min</span></div>
+          <div class="comment-text">
+            <strong>Plan d'implémentation :</strong><br><br>
+            1. Corriger le media query dans <code>src/styles/login.css</code><br>
+            2. Ajouter <code>env(safe-area-inset-bottom)</code><br>
+            3. Tester sur 375px et 768px<br>
+            4. Ouvrir une PR
+            <div class="comment-tag">&lt;!-- hermes --&gt;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">
+      <span class="annotation-icon">→</span>
+      <span>Hermes a lu l'issue via <code>gh issue view</code>, analysé le code, et posté un plan structuré</span>
+    </div>
+  </div>
+
+  <!-- Frame 4 : User approuve -->
+  <div class="frame" data-frame="4">
+    <div class="frame-label">04 — Tu valides</div>
+    <div class="comment-thread">
+      <div class="comment comment-user">
+        <div class="comment-avatar">👤</div>
+        <div class="comment-content">
+          <div class="comment-author">alshyra <span class="comment-time">à l'instant</span></div>
+          <div class="comment-text">Hermes approve</div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">
+      <span class="annotation-icon">→</span>
+      <span>Hermes crée la branche <code>feat/issue-42</code>, code la correction, commit et push</span>
+    </div>
+  </div>
+
+  <!-- Frame 5 : PR créée -->
+  <div class="frame" data-frame="5">
+    <div class="frame-label">05 — PR ouverte, déploiement</div>
+    <div class="comment-thread">
+      <div class="comment comment-bot">
+        <div class="comment-avatar">🤖</div>
+        <div class="comment-content">
+          <div class="comment-author">alshyra-bot <span class="comment-time">à l'instant</span></div>
+          <div class="comment-text">
+            ✅ Branch <code>feat/issue-42</code> créée<br>
+            ✅ Correction du media query appliquée<br>
+            ✅ PR <strong>#43</strong> ouverte — <em>"Closes #42"</em><br>
+            <br>
+            <span class="text-dim">🚀 Le merge déclenche GitHub Actions → docker compose up -d</span>
+            <div class="comment-tag">&lt;!-- hermes --&gt;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">
+      <span class="annotation-icon">→</span>
+      <span>Tout est automatisé : de l'issue au déploiement, sans toucher un terminal</span>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .workflow-chat {
+    max-width: 680px;
+    margin: 3rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .frame {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .frame.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .frame-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-blue, #197ca8);
+    margin-bottom: 0.5rem;
+  }
+
+  /* GitHub Issue */
+  .github-issue {
+    background: var(--bg-secondary, #f8f9fa);
+    border: 1px solid var(--separator, #e1e4e8);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+  }
+
+  .issue-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .issue-icon { font-size: 1rem; }
+
+  .issue-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--label-primary, #1a1a1a);
+  }
+
+  .issue-badge {
+    font-size: 0.7rem;
+    padding: 0.15em 0.5em;
+    border-radius: 99px;
+    background: #238636;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .issue-body {
+    font-size: 0.9rem;
+    color: var(--label-secondary, #555);
+    line-height: 1.6;
+  }
+
+  .issue-body code {
+    font-size: 0.85em;
+    background: var(--inline-code-bg, rgba(25,124,168,0.08));
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+
+  /* Comment Thread */
+  .comment-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .comment {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--separator, #e1e4e8);
+  }
+
+  .comment-user {
+    background: var(--bg-secondary, #f8f9fa);
+  }
+
+  .comment-bot {
+    background: linear-gradient(135deg, #f0f0ff, #f8f9fa);
+  }
+  [data-theme="dark"] .comment-bot {
+    background: linear-gradient(135deg, #1a1a3e, #1a1a2e);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .comment-bot {
+      background: linear-gradient(135deg, #1a1a3e, #1a1a2e);
+    }
+  }
+
+  .comment-avatar {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 2rem;
+    text-align: center;
+  }
+
+  .comment-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .comment-author {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--label-primary, #1a1a1a);
+    margin-bottom: 0.25rem;
+  }
+
+  .comment-time {
+    font-weight: 400;
+    color: var(--label-tertiary, #999);
+    font-size: 0.8rem;
+  }
+
+  .comment-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--label-secondary, #444);
+  }
+
+  .comment-text code {
+    font-size: 0.85em;
+    background: var(--inline-code-bg, rgba(25,124,168,0.08));
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+
+  .comment-text strong {
+    color: var(--label-primary, #1a1a1a);
+  }
+
+  .text-dim {
+    opacity: 0.6;
+    font-size: 0.85em;
+  }
+
+  .comment-tag {
+    font-size: 0.75rem;
+    color: var(--label-tertiary, #999);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  /* Annotation */
+  .annotation {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border-left: 3px solid var(--color-blue, #197ca8);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.85rem;
+    color: var(--label-secondary, #555);
+    line-height: 1.6;
+  }
+
+  .annotation-icon {
+    color: var(--color-blue, #197ca8);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .annotation code {
+    font-size: 0.85em;
+    background: var(--inline-code-bg, rgba(25,124,168,0.08));
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .workflow-chat {
+      margin: 1.5rem 0;
+      gap: 1rem;
+    }
+    .comment, .github-issue {
+      padding: 0.75rem 1rem;
+    }
+    .annotation {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    const frames = document.querySelectorAll('.frame');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.3 });
+    frames.forEach(f => observer.observe(f));
+  })();
+</script>
