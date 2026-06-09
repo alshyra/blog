@@ -1,6 +1,6 @@
 ---
-title: "Automatiser son workflow GitHub avec Hermes Agent"
-description: "Comment j'ai mis en place un pipeline GitHub complètement autonome : webhook → plan → approve → merge → déploiement, avec Hermes Agent."
+title: "Remplacer Copilot Cloud Agent par un workflow Hermes auto-hébergé"
+description: "GitHub Copilot Cloud Agent c'est génial, mais aux crédits ça coûte vite cher. Voilà comment obtenir la même chose — plan, approve, implémente, PR — avec Hermes Agent, pour le prix d'un VPS."
 pubDate: 2026-06-08
 category: "Hermes"
 homeFeatured: true
@@ -9,21 +9,45 @@ homeOrder: 1
 ---
 import WorkflowDiagram from '../../components/WorkflowDiagram.astro';
 
-**TL;DR** — Hermes Agent peut écouter les webhooks GitHub, analyser les issues et PR, proposer un plan, l'exécuter sur validation, et merge automatiquement. Le tout sur sa propre infra, sans dépendre d'un SaaS.
+**TL;DR** — Copilot Cloud Agent propose un workflow agentique (planifier, implémenter, PR) qui consomme des AI Credits à chaque étape. Hermes Agent fait exactement la même chose — webhook → plan → approve → implémente → merge — sur ton propre serveur. Coût fixe, pas de quota.
 
 ---
 
-## Pourquoi automatiser ?
+## Le constat
 
-J'utilise Hermes Agent pour plein de tâches du quotidien : revue de code, réponses sur des issues, corrections de bugs, petites features. Le problème ? Chaque interaction demandait de :
+Depuis le 1er juin 2026, GitHub Copilot est passé en facturation à l'usage. Chaque interaction avec les fonctionnalités agent (Copilot Cloud Agent, agent mode, code review) consomme des GitHub AI Credits. Concrètement :
 
-1. Lire le contexte (issue, PR, commentaire)
-2. Comprendre ce qui est demandé
-3. Faire les changements
-4. Ouvrir une PR ou merger
-5. Attendre le déploiement
+- **Copilot Pro** : 10$/mois, dont 10$ de crédits AI
+- **Copilot Pro+** : 39$/mois, dont 39$ de crédits AI
+- **1 crédit AI** = 0,01$ (une seule requête agent peut en coûter plusieurs)
 
-C'est beaucoup d'étapes manuelles pour des actions répétitives. Le workflow GitHub d'Hermes Agent réduit ça à une seule commande en commentaire.
+Les complétions de code restent illimitées — ça n'a pas changé. Mais les features *agentiques*[^1] — là où Copilot planifie, réfléchit, exécute en plusieurs étapes — consomment des crédits à chaque tour.
+
+Une après-midi à faire bosser un Cloud Agent sur des issues GitHub, et le budget crédits du mois peut y passer.
+
+[^1]: *Agentique* : un workflow où l'IA ne se contente pas de répondre, mais planifie, exécute des actions, itère jusqu'à un résultat. C'est ce qui différencie un chatbot d'un véritable assistant de développement.
+
+---
+
+## Ce que Copilot Cloud Agent fait de bien, et ce que Hermes reproduit
+
+Copilot Cloud Agent sait :
+- Analyser une issue GitHub
+- Proposer un plan d'implémentation
+- Exécuter les changements
+- Ouvrir une Pull Request
+
+Hermes Agent aussi — via un déclencheur webhook, un prompt bien conçu, et un workflow en commentaires GitHub. La différence ? Hermes tourne sur ton infra, pas sur des crédits.
+
+| Fonctionnalité | Copilot Cloud Agent | Hermes Agent |
+|---|---|---|
+| Analyse d'issue | ✅ crédits | ✅ VPS |
+| Plan d'implémentation | ✅ crédits | ✅ VPS |
+| Approbation humaine | ✅ "Approve" | ✅ "Hermes approve" |
+| Exécution + PR | ✅ crédits | ✅ VPS |
+| Review de code | ✅ crédits | ✅ VPS |
+| Fix inline | ✅ crédits | ✅ VPS |
+| **Coût par tâche** | **variable (crédits)** | **fixe (VPS)** |
 
 ---
 
@@ -31,7 +55,7 @@ C'est beaucoup d'étapes manuelles pour des actions répétitives. Le workflow G
 
 <WorkflowDiagram />
 
-*Le diagramme révèle chaque étape au scroll — les éléments apparaissent un par un.*
+*Le diagramme révèle chaque étape au scroll — exactement le même flux que Copilot Cloud Agent, mais sur ton matos.*
 
 ### Le webhook gateway
 
@@ -51,13 +75,11 @@ webhook_subscriptions:
     prompt: ~/.hermes/prompts/gh-plan-approve.txt
 ```
 
-Cette ligne suffit à connecter un repo entier. Le prompt `gh-plan-approve.txt` décrit le comportement attendu :
-
-> *Tu es un assistant DevOps intégré au workflow GitHub. Quand tu reçois une notification webhook, analyse le contexte complet de l'issue ou PR. Propose un plan d'action. L'utilisateur peut répondre "Hermes approve" pour exécuter.*
+Une ligne pour connecter un repo entier. Le prompt décrit le comportement attendu : analyser l'issue, proposer un plan, attendre l'approbation, exécuter.
 
 ### Les commandes disponibles
 
-Insensibles à la casse, reconnaissables en commentaire GitHub :
+Insensibles à la casse, en commentaire GitHub :
 
 <table>
   <thead><tr><th>Commande</th><th>Action</th></tr></thead>
@@ -65,101 +87,70 @@ Insensibles à la casse, reconnaissables en commentaire GitHub :
     <tr><td><strong>Hermes plan</strong></td><td>Analyser et proposer un plan</td></tr>
     <tr><td><strong>Hermes approve</strong></td><td>Valider et exécuter le plan</td></tr>
     <tr><td><strong>Hermes abort</strong></td><td>Annuler l'exécution en cours</td></tr>
-    <tr><td><strong>Hermes retry</strong></td><td>Réessayer après un échec</td></tr>
     <tr><td><strong>Hermes review</strong></td><td>Review de code</td></tr>
-    <tr><td><strong>Hermes fix all</strong></td><td>Corriger tous les problèmes</td></tr>
-    <tr><td><strong>Hermes fix it</strong></td><td>Corriger un problème spécifique</td></tr>
+    <tr><td><strong>Hermes fix all</strong></td><td>Corriger tous les retours</td></tr>
+    <tr><td><strong>Hermes fix it</strong></td><td>Corriger une ligne spécifique</td></tr>
   </tbody>
 </table>
 
 ---
 
-## L'anti-loop et la sécurité — les détails qui tuent
+## L'anti-loop et la sécurité
 
-Deux protections sont en place pour éviter les abus :
+Deux protections pour éviter que ça parte en vrille :
 
-### 1. Filtre par auteur (sécurité)
+### Filtre par auteur
 
-Avant toute chose, le worker webhook vérifie **qui** a envoyé l'événement. Si l'auteur (`sender.login`) n'est pas le propriétaire du repo, le message est ignoré silencieusement. Personne d'autre ne peut envoyer de commande à Hermes.
+Seul le propriétaire du dépôt peut envoyer des commandes. Un commentaire de n'importe qui d'autre est ignoré.
 
 ```python
 if sender.login != "alshyra":
-    return  # Ignorer, utilisateur non autorisé
+    return  # Ignorer
 ```
 
-### 2. Le tag anti-boucle
+### Tag anti-boucle
 
-Quand Hermes Agent poste un commentaire, il ajoute ce tag en commentaire HTML :
-
-```html
-<!-- hermes -->
-```
-
-Le webhook gateway vérifie sa présence : si le commentaire entrant contient `<!-- hermes -->`, il est ignoré.
+Chaque commentaire posté par le bot contient `<!-- hermes -->`. Le webhook ignore les commentaires qui portent ce tag — pas de boucle infinie.
 
 ```python
 if "<!-- hermes -->" in comment_body:
-    return  # Ignorer, c'est notre propre commentaire
+    return  # C'est notre propre message
 ```
 
 ---
 
 ## De l'issue à la PR au déploiement
 
-Le workflow complet pour une correction de bug :
-
-1. Un utilisateur (ou moi) ouvre une issue GitHub
+1. Une issue est ouverte (ou un commentaire laissé)
 2. Le webhook déclenche Hermes Agent
-3. Hermes lit l'issue avec `gh issue view`, comprend le contexte
-4. Il poste un plan : *"Je propose de modifier le fichier X pour corriger Y, puis d'ouvrir une PR"*
-5. Je commente `Hermes approve`
-6. Hermes exécute : branche, commit, push, ouvre une PR, merge
-7. Le push sur `main` déclenche GitHub Actions
-8. Le CI rsync les fichiers vers le VPS
-9. `docker compose up -d` redéploie les services concernés
+3. Hermes lit l'issue, comprend le contexte
+4. Il poste un plan en commentaire
+5. Tu écris `Hermes approve`
+6. Hermes implémente, commit, push, ouvre une PR, merge
+7. Le push sur `main` déclenche GitHub Actions → déploiement
 
-Tout ça sans que j'aie à ouvrir un terminal.
+Tout ça sans terminal, sans crédit consumé.
 
 ---
 
-## L'infrastructure derrière
+## Copilot et Hermes : complémentaires
 
-Tout tourne sur un petit VPS OVH :
+Mon setup aujourd'hui :
 
-<table>
-  <thead><tr><th>Service</th><th>Rôle</th></tr></thead>
-  <tbody>
-    <tr><td><strong>Hermes Agent</strong></td><td>Agent IA principal (systemd, standalone)</td></tr>
-    <tr><td><strong>Hermes WebUI</strong></td><td>Interface web (Docker, in-process)</td></tr>
-    <tr><td><strong>Traefik</strong></td><td>Reverse proxy, SSL Let's Encrypt</td></tr>
-    <tr><td><strong>OpenCode</strong></td><td>Webhook gateway secondaire (port 4097)</td></tr>
-    <tr><td><strong>Docker Compose</strong></td><td>Conteneurisation des services</td></tr>
-  </tbody>
-</table>
+- **Copilot** pour les complétions dans l'IDE (ça, c'est illimité, et c'est parfait)
+- **Hermes Agent** pour tout ce qui est agentique (issues, PRs, review, correction)
 
-Les webhooks arrivent directement sur le VPS — pas de tunnel, pas de service externe. Le VPS expose les ports 80/443, Traefik fait le routage.
+Les deux cohabitent. L'un pour le quotidien dans le code, l'autre pour l'automatisation des tâches GitHub. Et surtout : pas de compteur à surveiller, pas de budget à calculer, pas de "j'ai plus de crédits pour finir ma journée".
 
 ---
 
-## Pourquoi j'aime ce setup
+## Pour reproduire
 
-- **Pas de dépendance SaaS** — tout tourne sur mon matos (ou presque : GitHub héberge le code, OVH le VPS)
-- **Déclaratif** — la config tient dans quelques lignes YAML
-- **Extensible** — ajouter un nouveau repo ou une nouvelle commande prend 30 secondes
-- **Anti-fragile** — l'anti-loop empêche les délires, le timeout évite les runs infinis
+Le workflow complet est disponible ici :
+**[github.com/alshyra/hermes-github-agent](https://github.com/alshyra/hermes-github-agent/)**
 
----
-
-## Et ensuite ?
-
-Ce workflow est encore jeune. Les prochaines améliorations que je veux explorer :
-
-- **PR review automatique** déclenchée sur `opened` pull_request
-- **Dépendances entre tâches** — merges conditionnels, approbations en séquence
-- **Intégration WhatsApp** — approuver un plan depuis son téléphone
-
-Le code source d'Hermes Agent est ouvert : [github.com/nousresearch/hermes](https://github.com/nousresearch/hermes). Le workflow complet avec le prompt, la configuration webhook et le système de second brain est disponible dans le dépôt [github.com/alshyra/hermes-github-agent](https://github.com/alshyra/hermes-github-agent) — prêt à l'emploi.
+Le dépôt contient le prompt, la configuration webhook, le système de second brain, et un script d'installation.
 
 ---
 
-*Tu veux mettre en place un workflow similaire ? Ouvre une discussion, je peux détailler la config précise.*
+*Tu utilises Copilot Cloud Agent ? Tu as déjà checké ton crédit restant ce mois-ci ?*

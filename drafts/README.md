@@ -53,30 +53,27 @@ Construire son propre workflow, sur sa propre infra, avec ses propres règles.
 
 ---
 
-## ~~Article technique : le workflow GitHub Hermes~~
 ## Article technique : "Copilot aux crédits ? Voilà l'alternative Hermes"
 
-**Ancien titre** : "Automatiser son workflow GitHub avec Hermes Agent"
-**Nouveau titre (provisoire)** : "Vous avez cramé votre quota Copilot en 4 jours ? Moi aussi. Voilà l'alternative."
+**Statut** : ✅ Rédigé et publié
+**Angle** : "Les features agent de Copilot sont top. Mais aux crédits, ça coûte cher. Voilà comment faire pareil avec Hermes."
 
-(À affiner, mais le ton est : constat partagé → solution concrète → résultat.)
-
-### Nouvelle structure
-
-1. **L'accroche** — "Depuis le 1er juin, Copilot est passé aux crédits. Le Cloud Agent est génial, mais une après-midi à lui faire bosser des issues, et paf, le budget du mois y passe."
-2. **Le constat** — "Pas de surprise, GitHub avait prévenu. Mais en pratique, 10$ de crédits/mois pour un agent qui planifie et implémente... ça tient 4 jours."
-3. **L'alternative** — "Un workflow Hermes Agent auto-hébergé. Même principe : webhook → plan → approve → implémente → PR. Mais sur ton infra, pas sur des crédits."
-4. **Le résultat** — "Coût fixe du VPS. Pas de compteur. Pas de budget à surveiller. Et le même niveau d'automatisation."
-5. **Le reste** — l'article technique existant (diagramme, webhook, commandes, sécurité) vient en support.
-6. **Conclusion** — "Copilot pour les complétions, Hermes pour les agents. Les deux se complètent."
-
-### Tone
-- Direct, interpellant ("vous", pas "tu" au début, ou "tu" — à voir)
+### Tone retenu
+- Direct, interpellant ("vous", "tu" mélangé)
 - Pas de putaclic
 - Pas de bashing de GitHub
 - Juste : voilà le problème, voilà ce que j'ai fait, voilà comment reproduire
 
-### Axes d'amélioration
+### Structure finale
+1. **Le constat** — Copilot aux crédits depuis le 1er juin
+2. **Copilot Cloud Agent vs Hermes** — tableau comparatif
+3. **L'architecture du workflow** — diagramme scrollytelling
+4. **Le webhook et les commandes** — technique
+5. **Sécurité** — anti-loop + sender verification
+6. **Le workflow complet** — de l'issue au déploiement
+7. **Complémentaires** — Copilot pour l'IDE, Hermes pour l'agent
+
+### Axes d'amélioration restants
 - [ ] Diagrammes Excalidraw animés (apparition pas-à-pas)
 - [ ] Plus de visuel, moins de texte
 - [ ] Storytelling : problème → solution → résultat
