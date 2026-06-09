@@ -40,8 +40,6 @@ Maintenant on va voir ensemble comment on peut s'en passer.
 
 <WorkflowScrolly />
 
-*Chaque étape du workflow apparaît au scroll — exactement comme sur GitHub, mais avec les explications en dessous.*
-
 ### Le webhook gateway
 
 Hermes Agent expose un endpoint HTTP qui reçoit les webhooks GitHub. Pour chaque événement (`issues`, `issue_comment`, `pull_request`, `pull_request_review_comment`), un **worker webhook** est spawné avec le prompt approprié.
@@ -84,48 +82,15 @@ Insensibles à la casse, en commentaire GitHub :
 
 Deux protections pour éviter que ça parte en vrille :
 
-### Filtre par auteur
-
-Seul le propriétaire du dépôt peut envoyer des commandes. Un commentaire de n'importe qui d'autre est ignoré.
+* Seul le propriétaire du dépôt peut envoyer des commandes. Un commentaire de n'importe qui d'autre est ignoré.
+* Chaque commentaire posté par le bot contient `<!-- hermes -->`. Le webhook ignore les commentaires qui portent ce tag — pas de boucle infinie.
 
 ```python
 if sender.login != "alshyra":
     return  # Ignorer
-```
-
-### Tag anti-boucle
-
-Chaque commentaire posté par le bot contient `<!-- hermes -->`. Le webhook ignore les commentaires qui portent ce tag — pas de boucle infinie.
-
-```python
 if "<!-- hermes -->" in comment_body:
     return  # C'est notre propre message
 ```
-
----
-
-## De l'issue à la PR au déploiement
-
-1. Une issue est ouverte (ou un commentaire laissé)
-2. Le webhook déclenche Hermes Agent
-3. Hermes lit l'issue, comprend le contexte
-4. Il poste un plan en commentaire
-5. Tu écris `Hermes approve`
-6. Hermes implémente, commit, push, ouvre une PR, merge
-7. Le push sur `main` déclenche GitHub Actions → déploiement
-
-Tout ça sans terminal, sans crédit consumé.
-
----
-
-## Copilot et Hermes : complémentaires
-
-Mon setup aujourd'hui :
-
-- **Copilot** pour les complétions dans l'IDE (ça, c'est illimité, et c'est parfait)
-- **Hermes Agent** pour tout ce qui est agentique (issues, PRs, review, correction)
-
-Les deux cohabitent. L'un pour le quotidien dans le code, l'autre pour l'automatisation des tâches GitHub. Et surtout : pas de compteur à surveiller, pas de budget à calculer, pas de "j'ai plus de crédits pour finir ma journée".
 
 ---
 

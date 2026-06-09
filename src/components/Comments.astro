@@ -1,108 +1,103 @@
 ---
-import config from '../../astro-theme-config';
-import { withBase, withoutBase } from '../utils/paths';
-
-const comments = config.comments;
-const giscus = {
-  ...comments.giscus,
-  repo: import.meta.env.PUBLIC_GISCUS_REPO || comments.giscus.repo,
-  repoId: import.meta.env.PUBLIC_GISCUS_REPO_ID || comments.giscus.repoId,
-  category: import.meta.env.PUBLIC_GISCUS_CATEGORY || comments.giscus.category,
-  categoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID || comments.giscus.categoryId,
-  reactionsEnabled:
-    import.meta.env.PUBLIC_GISCUS_REACTIONS_ENABLED || comments.giscus.reactionsEnabled,
-};
-const commentsMode = import.meta.env.PUBLIC_GISCUS_MODE || comments.mode;
-const canUseCommentsMode =
-  commentsMode === 'giscus' || commentsMode === 'giscus-custom';
-const canRenderGiscus =
-  canUseCommentsMode &&
-  comments.provider === 'giscus' &&
-  giscus.repo &&
-  giscus.repoId &&
-  giscus.category &&
-  giscus.categoryId;
-const giscusTerm = withoutBase(Astro.url.pathname).replace(/^\/+/, '');
-const giscusMapping = giscus.mapping === 'pathname' ? 'specific' : giscus.mapping;
+// Comments.astro — Giscus comment system (GitHub Discussions)
 ---
 
-{
-  canRenderGiscus && (
-    <section class="comments-section" data-pagefind-ignore="all" aria-label="Comments">
-      <p class="comments-label">Comments</p>
-      <div
-        id="giscus-container"
-        class="giscus"
-        data-repo={giscus.repo}
-        data-repo-id={giscus.repoId}
-        data-category={giscus.category}
-        data-category-id={giscus.categoryId}
-        data-mapping={giscusMapping}
-        data-term={giscusTerm}
-        data-strict={giscus.strict}
-        data-reactions-enabled={giscus.reactionsEnabled}
-        data-emit-metadata={giscus.emitMetadata}
-        data-input-position="bottom"
-        data-theme={giscus.theme}
-        data-theme-mode={commentsMode === 'giscus-custom' ? 'custom' : 'default'}
-        data-lang={giscus.lang}
-        data-loading={giscus.loading}
-        data-light-theme-path={withBase(giscus.customLightTheme)}
-        data-dark-theme-path={withBase(giscus.customDarkTheme)}
-      />
-    </section>
-  )
-}
+<section class="comments-section">
+  <div class="comments-divider"></div>
+  <h2 class="comments-title">💬 Commentaires</h2>
+  <p class="comments-subtitle">Connecte-toi avec GitHub pour réagir ou poser une question.</p>
 
-{
-  canRenderGiscus && (
-    <script>
-      import { mountGiscusComments } from '../scripts/giscus-comments';
+  <div id="giscus-container"></div>
 
-      mountGiscusComments();
-    </script>
-  )
-}
+  <script is:inline>
+    // Giscus configuration — REPLACE WITH YOUR VALUES
+    const GISCUS_CONFIG = {
+      repo: 'alshyra/blog',
+      repoId: 'REPLACE_ME',           // ← remplir depuis giscus.app
+      category: 'Blog Comments',
+      categoryId: 'REPLACE_ME',       // ← remplir depuis giscus.app
+      mapping: 'pathname',
+      strict: '0',
+      reactionsEnabled: '1',
+      emitMetadata: '0',
+      inputPosition: 'bottom',
+      lang: 'fr',
+      loading: 'lazy',
+    };
+
+    function loadGiscus() {
+      const container = document.getElementById('giscus-container');
+      if (!container || container.querySelector('script')) return;
+
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.setAttribute('data-repo', GISCUS_CONFIG.repo);
+      script.setAttribute('data-repo-id', GISCUS_CONFIG.repoId);
+      script.setAttribute('data-category', GISCUS_CONFIG.category);
+      script.setAttribute('data-category-id', GISCUS_CONFIG.categoryId);
+      script.setAttribute('data-mapping', GISCUS_CONFIG.mapping);
+      script.setAttribute('data-strict', GISCUS_CONFIG.strict);
+      script.setAttribute('data-reactions-enabled', GISCUS_CONFIG.reactionsEnabled);
+      script.setAttribute('data-emit-metadata', GISCUS_CONFIG.emitMetadata);
+      script.setAttribute('data-input-position', GISCUS_CONFIG.inputPosition);
+      script.setAttribute('data-lang', GISCUS_CONFIG.lang);
+      script.setAttribute('data-loading', GISCUS_CONFIG.loading);
+      script.setAttribute('data-theme', getCurrentTheme());
+      script.crossOrigin = 'anonymous';
+      script.async = true;
+      container.appendChild(script);
+    }
+
+    function getCurrentTheme() {
+      const isDark = document.documentElement.classList.contains('dark')
+        || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      return isDark ? 'dark' : 'light';
+    }
+
+    function updateGiscusTheme() {
+      const iframe = document.querySelector('iframe.giscus-frame');
+      if (!iframe) return;
+      iframe.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: getCurrentTheme() } } },
+        'https://giscus.app'
+      );
+    }
+
+    // Load on DOM ready
+    document.addEventListener('DOMContentLoaded', loadGiscus);
+
+    // Sync theme on toggle
+    const observer = new MutationObserver(updateGiscusTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  </script>
+</section>
 
 <style>
-.comments-section {
-  max-width: var(--max-width-content);
-  margin-top: var(--space-8);
-  padding-top: var(--space-4);
-  border-top: 1px solid rgba(60, 60, 67, 0.08);
-}
+  .comments-section {
+    max-width: var(--max-width-content);
+    margin: var(--space-12) auto var(--space-8);
+  }
 
-.comments-label {
-  margin: 0 0 var(--space-4);
-  color: var(--label-tertiary);
-  font-size: var(--text-caption-1);
-  font-weight: var(--weight-accent-label);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+  .comments-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--separator);
+    margin-bottom: var(--space-8);
+  }
 
-.giscus {
-  --giscus-unmeasured-height: clamp(14rem, 34vh, 18rem);
+  .comments-title {
+    font-size: var(--text-title-3);
+    font-weight: var(--weight-semibold);
+    color: var(--label-primary);
+    margin-bottom: var(--space-2);
+  }
 
-  min-height: var(--giscus-unmeasured-height);
-}
-
-.giscus :global(iframe.giscus-frame) {
-  display: block;
-  width: 100%;
-  opacity: 1;
-}
-
-.giscus.is-ready :global(iframe.giscus-frame) {
-  opacity: 1 !important;
-}
-
-.giscus.is-loading:not(.is-ready) :global(iframe.giscus-frame) {
-  opacity: 0 !important;
-  pointer-events: none;
-}
-
-.giscus:not(.is-resized) :global(iframe.giscus-frame) {
-  min-height: var(--giscus-unmeasured-height);
-}
+  .comments-subtitle {
+    font-size: var(--text-subheadline);
+    color: var(--label-tertiary);
+    margin-bottom: var(--space-6);
+  }
 </style>
