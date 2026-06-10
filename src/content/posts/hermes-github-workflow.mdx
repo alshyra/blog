@@ -102,29 +102,11 @@ Une seule ligne pour connecter un repo entier. Le prompt (un fichier texte) déc
 
 <WorkflowScrolly />
 
-### Le webhook gateway
-
-Hermes Agent expose un endpoint HTTP qui reçoit les webhooks GitHub. Pour chaque événement (`issues`, `issue_comment`, `pull_request`, `pull_request_review_comment`), un **worker webhook** est spawné avec le prompt approprié.
-
-La configuration est déclarative :
-
-```yaml
-# ~/.hermes/config.yaml
-webhook_subscriptions:
-  - id: rpg-issues
-    events:
-      - issues
-      - issue_comment
-      - pull_request
-      - pull_request_review_comment
-    prompt: ~/.hermes/prompts/gh-plan-approve.txt
-```
-
 Une ligne pour connecter un repo entier. Le prompt décrit le comportement attendu : analyser l'issue, proposer un plan, attendre l'approbation, exécuter.
 
 ### Les commandes disponibles
 
-Insensibles à la casse, en commentaire GitHub :
+Insensibles à la casse, en commentaire directement sur GitHub :
 
 <table>
   <thead><tr><th>Commande</th><th>Action</th></tr></thead>
