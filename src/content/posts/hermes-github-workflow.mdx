@@ -8,6 +8,7 @@ homeHeroOrder: 1
 homeOrder: 1
 ---
 import WorkflowScrolly from '../../components/WorkflowScrolly.astro';
+import FakeTerminal from '../../components/FakeTerminal.astro';
 
 ## Le constat
 
@@ -43,12 +44,29 @@ Pour le workflow qui nous intéresse, Hermes expose un **webhook gateway** : il 
 
 ## Prérequis
 
-- **Un serveur Linux** — un VPS à 5€/mois suffit (2 vCPU, 1 Go RAM)
+- **Un serveur Linux** — un VPS [OVH VPS-1](https://www.ovhcloud.com/fr/vps/) à 5,52€ HT/mois suffit (4 vCores, 8 Go RAM)
 - **[Hermes Agent](https://hermes-agent.nousresearch.com/docs)** installé et configuré avec un provider LLM (OpenRouter, Anthropic, etc.)
-- **[GitHub CLI](https://cli.github.com/)** (`gh`) installé et authentifié sur le serveur : `gh auth login`
+- **[GitHub CLI](https://cli.github.com/)** (`gh`) installé et authentifié sur le serveur
 - **Un dépôt GitHub** public ou avec accès Actions
 
 ## Configurer le webhook GitHub
+
+### 1. Installer les outils
+
+<FakeTerminal>
+<div class="line"><span class="comment"># Installer GitHub CLI</span></div>
+<div class="line"><span class="prompt">$ </span><span class="cmd">sudo apt install gh</span></div>
+<div class="line"><span class="output">Reading package lists... Done</span></div>
+<div class="line"><span class="prompt">$ </span><span class="cmd">gh auth login</span></div>
+<div class="line"><span class="output">✓ Logged in to github.com</span></div>
+<div class="line"></div>
+<div class="line"><span class="comment"># Installer et vérifier Hermes</span></div>
+<div class="line"><span class="prompt">$ </span><span class="cmd">hermes doctor</span></div>
+<div class="line"><span class="success">✓ Config OK — Model: openrouter/...</span></div>
+<div class="line"><span class="success">✓ Gateway ready — Listening on :8080</span></div>
+</FakeTerminal>
+
+### 2. Configurer le webhook GitHub
 
 Dans les settings de ton dépôt → **Webhooks** → **Add webhook** :
 
