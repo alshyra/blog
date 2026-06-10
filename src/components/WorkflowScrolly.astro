@@ -262,7 +262,7 @@
 
 <script>
 (function() {
-  // Chaque step = un groupe (annotation + message)
+  // Chaque step = un tour de conversation
   const groups = [
     // Step 1 : Issue
     [
@@ -271,24 +271,24 @@
     // Step 2 : "hermes plan"
     [
       { type: 'user', name: 'alshyra', text: 'hermes plan' },
-      { type: 'annotation', text: '→ Hermes identifie la commande, lit l\'issue via <code>gh issue view</code>' },
     ],
     // Step 3 : Bot répond
     [
       { type: 'bot', name: 'alshyra-bot',
         text: '<strong>Plan d\'implémentation :</strong><br><br>1. Corriger le media query dans <code>src/styles/login.css</code><br>2. Ajouter <code>env(safe-area-inset-bottom)</code><br>3. Tester sur 375px et 768px<br>4. Ouvrir une PR',
         tag: '<!-- hermes -->' },
+      { type: 'annotation', text: '→ Hermes a analysé via <code>gh issue view</code>, lu le code, et posté un plan' },
     ],
     // Step 4 : Approve
     [
       { type: 'user', name: 'alshyra', text: 'Hermes approve' },
-      { type: 'annotation', text: '→ Hermes crée la branche <code>feat/issue-42</code>, code, commit, push' },
     ],
     // Step 5 : PR
     [
       { type: 'bot', name: 'alshyra-bot',
         text: '✅ Branch <code>feat/issue-42</code> créée<br>✅ Correction du media query<br>✅ PR <strong>#43</strong> ouverte — <em>"Closes #42"</em><br><br><span class="text-muted">🚀 Merge → GitHub Actions → docker compose up -d</span>',
         tag: '<!-- hermes -->' },
+      { type: 'annotation', text: '→ Tout est automatisé : de l\'issue au déploiement, sans toucher un terminal' },
     ],
   ];
 
