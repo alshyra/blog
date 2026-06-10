@@ -1,0 +1,103 @@
+---
+// ui/ChatBubble.astro — Bulle de message réutilisable
+// Props: side ('user' | 'bot'), name (string), time (string), tag (string?)
+const { side = 'user', name = '', time = '', tag = '' } = Astro.props;
+---
+
+<div class={`bubble bubble--${side}`}>
+  <div class="bubble__avatar">{side === 'user' ? '👤' : '🤖'}</div>
+  <div class="bubble__body">
+    <div class="bubble__name">{name} {time && <span>{time}</span>}</div>
+    <div class="bubble__content">
+      <slot />
+    </div>
+    {tag && <div class="bubble__tag">{tag}</div>}
+  </div>
+</div>
+
+<style is:global>
+  .bubble {
+    display: flex;
+    gap: var(--space-3);
+    max-width: 85%;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+  }
+  .bubble.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .bubble--user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+  .bubble--bot {
+    align-self: flex-start;
+  }
+
+  .bubble__avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .bubble--user .bubble__avatar { background: var(--fill-secondary); }
+  .bubble--bot .bubble__avatar { background: var(--fill-primary); }
+
+  .bubble__body { flex: 1; min-width: 0; }
+
+  .bubble__name {
+    font-size: var(--text-caption-1);
+    font-weight: var(--weight-semibold);
+    color: var(--label-primary);
+    margin-bottom: 2px;
+  }
+  .bubble__name span {
+    font-weight: var(--weight-regular);
+    color: var(--label-tertiary);
+    font-size: var(--text-caption-2);
+    margin-left: var(--space-1);
+  }
+
+  .bubble__content {
+    font-size: var(--text-callout);
+    line-height: var(--leading-relaxed);
+    color: var(--label-secondary);
+    background: var(--fill-quaternary);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border-top-left-radius: var(--radius-xs);
+    border-top-right-radius: var(--radius-md);
+  }
+  .bubble--user .bubble__content {
+    background: var(--fill-secondary);
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-xs);
+  }
+
+  .bubble__content code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--fill-quaternary);
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius-xs);
+  }
+  .bubble__content strong { color: var(--label-primary); }
+  .bubble__content .text-muted {
+    opacity: 0.6;
+    font-size: var(--text-subheadline);
+  }
+
+  .bubble__tag {
+    font-size: var(--text-caption-2);
+    color: var(--label-tertiary);
+    font-style: italic;
+    margin-top: var(--space-2);
+  }
+</style>
